@@ -63,50 +63,50 @@ private:
 
 void ScopedDatastoreSegment::sweep() { }
 
-static int64_t HHVM_FUNCTION(hhvm_newrelic_transaction_begin) {
+static int64_t HHVM_FUNCTION(newrelic_start_transaction) {
 	long transaction_id = newrelic_transaction_begin();
 	return transaction_id;
 }
 
-static int HHVM_FUNCTION(hhvm_newrelic_transaction_set_name, const String & name) {
+static int HHVM_FUNCTION(newrelic_name_transaction, const String & name) {
 	return newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, name.c_str());
 }
 
-static int HHVM_FUNCTION(hhvm_newrelic_transaction_set_request_url, const String & request_url) {
+static int HHVM_FUNCTION(newrelic_transaction_set_request_url, const String & request_url) {
 	return newrelic_transaction_set_request_url(NEWRELIC_AUTOSCOPE, request_url.c_str());
 }
 
-static int HHVM_FUNCTION(hhvm_newrelic_transaction_set_max_trace_segments, int threshold) {
+static int HHVM_FUNCTION(newrelic_transaction_set_max_trace_segments, int threshold) {
 	return newrelic_transaction_set_max_trace_segments(NEWRELIC_AUTOSCOPE, threshold);
 }
 
-static int HHVM_FUNCTION(hhvm_newrelic_transaction_set_threshold, int threshold) {
+static int HHVM_FUNCTION(newrelic_transaction_set_threshold, int threshold) {
 	return newrelic_transaction_set_threshold(NEWRELIC_AUTOSCOPE, threshold);
 }
 
-static int HHVM_FUNCTION(hhvm_newrelic_transaction_end) {
+static int HHVM_FUNCTION(newrelic_end_transaction) {
 	return newrelic_transaction_end(NEWRELIC_AUTOSCOPE);
 }
 
-static int64_t HHVM_FUNCTION(hhvm_newrelic_segment_generic_begin, const String & name) {
+static int64_t HHVM_FUNCTION(newrelic_segment_generic_begin, const String & name) {
 	return newrelic_segment_generic_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, name.c_str());
 }
 
-static int64_t HHVM_FUNCTION(hhvm_newrelic_segment_datastore_begin, const String & table, const String & operation) {
+static int64_t HHVM_FUNCTION(newrelic_segment_datastore_begin, const String & table, const String & operation) {
 	return newrelic_segment_datastore_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, table.c_str(), operation.c_str());
 }
 
-static int HHVM_FUNCTION(hhvm_newrelic_segment_end, int64_t id) {
+static int HHVM_FUNCTION(newrelic_segment_end, int64_t id) {
 	return newrelic_segment_end(NEWRELIC_AUTOSCOPE, id);
 }
 
-static Variant HHVM_FUNCTION(hhvm_newrelic_get_scoped_generic_segment, const String & name) {
+static Variant HHVM_FUNCTION(newrelic_get_scoped_generic_segment, const String & name) {
 	ScopedGenericSegment * segment = nullptr;
 	segment = NEWOBJ(ScopedGenericSegment)(name.c_str());
 	return Resource(segment);
 }
 
-static Variant HHVM_FUNCTION(hhvm_newrelic_get_scoped_database_segment, const String & table, const String & operation) {
+static Variant HHVM_FUNCTION(newrelic_get_scoped_database_segment, const String & table, const String & operation) {
 	ScopedDatastoreSegment * segment = nullptr;
 	segment = NEWOBJ(ScopedDatastoreSegment)(table.c_str(), operation.c_str());
 	return Resource(segment);
@@ -160,17 +160,17 @@ public:
 	virtual void moduleInit () {
 		if (config_loaded) init_newrelic();
 
-		HHVM_FE(hhvm_newrelic_transaction_begin);
-		HHVM_FE(hhvm_newrelic_transaction_set_name);
-		HHVM_FE(hhvm_newrelic_transaction_set_request_url);
-		HHVM_FE(hhvm_newrelic_transaction_set_max_trace_segments);
-		HHVM_FE(hhvm_newrelic_transaction_set_threshold);
-		HHVM_FE(hhvm_newrelic_transaction_end);
-		HHVM_FE(hhvm_newrelic_segment_generic_begin);
-		HHVM_FE(hhvm_newrelic_segment_datastore_begin);
-		HHVM_FE(hhvm_newrelic_segment_end);
-		HHVM_FE(hhvm_newrelic_get_scoped_generic_segment);
-		HHVM_FE(hhvm_newrelic_get_scoped_database_segment);
+		HHVM_FE(newrelic_start_transaction);
+		HHVM_FE(newrelic_name_transaction);
+		HHVM_FE(newrelic_transaction_set_request_url);
+		HHVM_FE(newrelic_transaction_set_max_trace_segments);
+		HHVM_FE(newrelic_transaction_set_threshold);
+		HHVM_FE(newrelic_end_transaction);
+		HHVM_FE(newrelic_segment_generic_begin);
+		HHVM_FE(newrelic_segment_datastore_begin);
+		HHVM_FE(newrelic_segment_end);
+		HHVM_FE(newrelic_get_scoped_generic_segment);
+		HHVM_FE(newrelic_get_scoped_database_segment);
 
 		loadSystemlib();
 	}

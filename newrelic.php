@@ -1,34 +1,34 @@
 <?hh
 <<__Native>>
-function hhvm_newrelic_transaction_begin(): int;
+function newrelic_start_transaction(): int;
 
 <<__Native>>
-function hhvm_newrelic_transaction_set_name(string $name): int;
+function newrelic_name_transaction(string $name): int;
 
 <<__Native>>
-function hhvm_newrelic_transaction_set_request_url(string $name): int;
+function newrelic_transaction_set_request_url(string $name): int;
 
 <<__Native>>
-function hhvm_newrelic_transaction_set_threshold(int $threshold): int;
+function newrelic_transaction_set_threshold(int $threshold): int;
 
 <<__Native>>
-function hhvm_newrelic_transaction_end(): int;
+function newrelic_end_transaction(): int;
 
 <<__Native>>
-function hhvm_newrelic_segment_generic_begin(string $name): int;
+function newrelic_segment_generic_begin(string $name): int;
 
 <<__Native>>
-function hhvm_newrelic_segment_datastore_begin(string $table, string $operation): int;
+function newrelic_segment_datastore_begin(string $table, string $operation): int;
 
 <<__Native>>
-function hhvm_newrelic_segment_end(int $id): int;
+function newrelic_segment_end(int $id): int;
 
 <<__Native>>
-function hhvm_newrelic_get_scoped_generic_segment(string $name): mixed;
+function newrelic_get_scoped_generic_segment(string $name): mixed;
 
 <<__Native>>
-function hhvm_newrelic_get_scoped_database_segment(string $table, string $operation): mixed;
+function newrelic_get_scoped_database_segment(string $table, string $operation): mixed;
 
 <<__Native>>
-function hhvm_newrelic_transaction_set_max_trace_segments(int $threshold): int;
+function newrelic_transaction_set_max_trace_segments(int $threshold): int;
 
