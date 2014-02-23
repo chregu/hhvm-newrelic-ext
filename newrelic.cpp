@@ -63,12 +63,12 @@ private:
 
 void ScopedDatastoreSegment::sweep() { }
 
-static int64_t HHVM_FUNCTION(newrelic_start_transaction) {
+static int64_t HHVM_FUNCTION(newrelic_start_transaction_intern) {
 	long transaction_id = newrelic_transaction_begin();
 	return transaction_id;
 }
 
-static int HHVM_FUNCTION(newrelic_name_transaction, const String & name) {
+static int HHVM_FUNCTION(newrelic_name_transaction_intern, const String & name) {
 	return newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, name.c_str());
 }
 
@@ -157,11 +157,12 @@ public:
 
 	}
 
+
 	virtual void moduleInit () {
 		if (config_loaded) init_newrelic();
 
-		HHVM_FE(newrelic_start_transaction);
-		HHVM_FE(newrelic_name_transaction);
+		HHVM_FE(newrelic_start_transaction_intern);
+		HHVM_FE(newrelic_name_transaction_intern);
 		HHVM_FE(newrelic_transaction_set_request_url);
 		HHVM_FE(newrelic_transaction_set_max_trace_segments);
 		HHVM_FE(newrelic_transaction_set_threshold);
@@ -174,13 +175,23 @@ public:
 
 		loadSystemlib();
 	}
+	
+	virtual void requestShutdown() {
+		global_transaction_id = 0;
+	}
+
+	virtual void requestInit() {
+		//make this optional
+		global_transaction_id = newrelic_transaction_begin();
+	}
+	
 
 private:
 	std::string license_key;
 	std::string app_name;
 	std::string app_language;
 	std::string app_language_version;
-
+	long global_transaction_id = 0;
 	bool config_loaded;
 
 } s_newrelic_extension;
