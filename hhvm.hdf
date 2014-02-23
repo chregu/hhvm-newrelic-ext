@@ -1,0 +1,66 @@
+Server {
+  Port = 8888
+  SourceRoot = /var/www/
+}
+EnvVariables {
+  NEWRELIC_LICENSE_KEY = INSERT YOUR KEY HERE
+  NEWRELIC_APP_NAME = HHVM Example
+  NEWRELIC_APP_LANGUAGE = php-hhvm
+  NEWRELIC_APP_LANGUAGE_VERSION = 2.4.0
+}
+
+Eval {
+  Jit = true
+}
+Log {
+  Level = Error
+  UseLogFile = true
+  File = /var/log/hhvm/error.log
+  Access {
+    * {
+      File = /var/log/hhvm/access.log
+      Format = %h %l %u %t \"%r\" %>s %b
+    }
+  }
+}
+
+VirtualHost {
+  * {
+    Pattern = .*
+    RewriteRules {
+      dirindex {
+        pattern = ^/(.*)/$
+        to = $1/index.php
+        qsa = true
+      }
+    }
+  }
+}
+
+StaticFile {
+  FilesMatch {
+    * {
+      pattern = .*\.(dll|exe)
+      headers {
+        * = Content-Disposition: attachment
+      }
+    }
+  }
+  Extensions {
+    css = text/css
+    gif = image/gif
+    html = text/html
+    jpe = image/jpeg
+    jpeg = image/jpeg
+    jpg = image/jpeg
+    png = image/png
+    tif = image/tiff
+    tiff = image/tiff
+    txt = text/plain
+  }
+}
+
+DynamicExtensions {
+  newrelic = /path/to/newrelic.so
+}
+
