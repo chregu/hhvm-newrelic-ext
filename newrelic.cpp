@@ -177,14 +177,17 @@ public:
 	}
 	
 	virtual void requestShutdown() {
-		global_transaction_id = 0;
+		
+		if (global_transaction_id != 0) {
+			newrelic_transaction_end(global_transaction_id);
+			global_transaction_id = 0;
+		}
 	}
 
 	virtual void requestInit() {
 		//make this optional
 		global_transaction_id = newrelic_transaction_begin();
 	}
-	
 
 private:
 	std::string license_key;
