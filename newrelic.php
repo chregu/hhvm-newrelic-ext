@@ -3,6 +3,21 @@
 //not implemented yet
 function newrelic_set_appname(string $name, string $key, bool $xmit): mixed {}
 
+//not implemented yet
+function newrelic_custom_metric(string $name, float $value) {}
+
+//not implemented yet
+function newrelic_add_custom_parameter(string $name, string $value) {}
+
+//not implemented yet
+function newrelic_disable_autorum() {}
+
+//not implemented yet
+function newrelic_notice_error(string $message, \Exception $e = null)  {}
+
+//not implemented yet
+function newrelic_background_job(bool $true) {}
+
 function newrelic_start_transaction(string $appname, string $license = null) {
     newrelic_start_transaction_intern();
     newrelic_transaction_set_request_url($_SERVER["REQUEST_URI"]);
