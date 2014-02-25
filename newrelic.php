@@ -28,6 +28,67 @@ function newrelic_name_transaction(string $name) {
     newrelic_transaction_set_request_url($_SERVER["REQUEST_URI"]);
 }
 
+function newrelic_profiling_enable(int $level) {
+    if (function_exists("newrelic_hotprofiling_enabled_intern")) {
+        xhprof_enable(256,array(0 => $level));
+    } else {
+        NewRelicExtensionHelper::setMaxDepth($level);
+        fb_setprofile(array("NewRelicExtensionHelper","profile"));
+    }
+}
+
+function newrelic_profiling_disable() {
+    if (function_exists("newrelic_hotprofiling_enabled_intern")) {
+        xhprof_disable();
+    } else {
+        NewRelicExtensionHelper::endAll();
+        fb_setprofile(null);
+    }
+}
+    
+    
+class NewRelicExtensionHelper {
+
+    protected static Vector<int> $stack = Vector {};
+    // there's an issue with the depth, if you enable/disable it at different depths... have to figure something out
+    protected static int $depth =  0;
+    protected static int $maxdepth = 7;
+    
+    static function profile (string $mode, string $name, array $options = null): void {
+        if ($name) {
+            if ($mode == 'enter')  {
+                if (self::$depth < self::$maxdepth) {
+                    self::$stack->add(newrelic_segment_generic_begin($name));
+                } else {
+                    self::$stack->add(0);
+                }
+                self::$depth++;
+            } else {
+                $id =  self::$stack->pop();
+                if ($id) {
+                    newrelic_segment_end($id);
+                }
+                self::$depth--;
+            }
+        }
+    }
+    
+    static function setMaxDepth(int $depth): void {
+        self::$maxdepth = $depth;
+    }
+    
+    static function endAll(): void {
+        while (self::$stack->count()) {
+            $id = self::$stack->pop();
+            if ($id) {
+                 newrelic_segment_end($id);
+            }
+        }
+        self::$depth = 0;
+    }
+}
+
+
 <<__Native>>
 function newrelic_start_transaction_intern(): int;
 
