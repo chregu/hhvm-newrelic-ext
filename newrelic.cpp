@@ -178,15 +178,11 @@ public:
 	
 	virtual void requestShutdown() {
 		
-		if (global_transaction_id != 0) {
-			newrelic_transaction_end(global_transaction_id);
-			global_transaction_id = 0;
-		}
+		newrelic_transaction_end(NEWRELIC_AUTOSCOPE);
 	}
 
 	virtual void requestInit() {
-		//make this optional
-		global_transaction_id = newrelic_transaction_begin();
+		newrelic_transaction_begin();
 	}
 
 private:
