@@ -60,13 +60,17 @@ class NewRelicExtensionHelper {
                 if (self::$depth < self::$maxdepth) {
                     self::$stack->add(newrelic_segment_generic_begin($name));
                 } else {
-                    self::$stack->add(0);
+                    //self::$stack->add(0);
                 }
                 self::$depth++;
             } else {
-                $id =  self::$stack->pop();
-                if ($id) {
-                    newrelic_segment_end($id);
+                if (self::$depth < self::$maxdepth + 1) {
+                    try {
+                        $id =  self::$stack->pop();
+                        if ($id) {
+                            newrelic_segment_end($id);
+                        }
+                    } catch (Exception $e) {}
                 }
                 self::$depth--;
             }
