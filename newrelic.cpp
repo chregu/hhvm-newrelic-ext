@@ -100,6 +100,10 @@ static int HHVM_FUNCTION(newrelic_segment_end, int64_t id) {
 	return newrelic_segment_end(NEWRELIC_AUTOSCOPE, id);
 }
 
+static int HHVM_FUNCTION(newrelic_notice_error_intern, const String & exception_type,  const String & error_message,  const String & stack_trace,  const String & stack_frame_delimiter) {
+	return newrelic_transaction_notice_error(NEWRELIC_AUTOSCOPE, exception_type.c_str(), error_message.c_str(), stack_trace.c_str(), stack_frame_delimiter.c_str());
+}
+
 static Variant HHVM_FUNCTION(newrelic_get_scoped_generic_segment, const String & name) {
 	ScopedGenericSegment * segment = nullptr;
 	segment = NEWOBJ(ScopedGenericSegment)(name.c_str());
@@ -172,6 +176,7 @@ public:
 		HHVM_FE(newrelic_segment_end);
 		HHVM_FE(newrelic_get_scoped_generic_segment);
 		HHVM_FE(newrelic_get_scoped_database_segment);
+		HHVM_FE(newrelic_notice_error_intern);
 
 		loadSystemlib();
 	}

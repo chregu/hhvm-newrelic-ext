@@ -122,5 +122,7 @@ function newrelic_get_scoped_database_segment(string $table, string $operation):
 <<__Native>>
 function newrelic_transaction_set_max_trace_segments(int $threshold): int;
 
+<<__Native>>
+function newrelic_notice_error_intern(string $exception_type, string $error_message, string $stack_trace, string $stack_frame_delimiter): int;
 
 
