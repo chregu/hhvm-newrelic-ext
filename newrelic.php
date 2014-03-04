@@ -86,6 +86,75 @@ class NewRelicExtensionHelper {
         }
         self::$depth = 0;
     }
+
+    static function errorCallback($type, $message, $c) {
+        $exception_type = self::friendlyErrorType($type);
+        $error_message = $message;
+        $stack_trace = self::debug_backtrace_string();
+        $stack_frame_delimiter = "\n";
+        newrelic_notice_error_intern( $exception_type,  $error_message,  $stack_trace,  $stack_frame_delimiter);
+        return false;
+    }
+    
+    
+    static function debug_backtrace_string() {
+        $stack = '';
+        $i = 1;
+        $trace = debug_backtrace();
+        unset($trace[0]); //Remove call to this function from stack trace
+        foreach($trace as $key => $node) {
+            
+            $stack .= "#$i ".$node['file'] ."(" .$node['line']."): ";
+            if ($key > 1) {
+                if(isset($node['class'])) {
+                    $stack .= $node['class'] . "->"; 
+                }
+                $stack .= $node['function'] . "()" . PHP_EOL;
+            } else {
+                $stack .= PHP_EOL;
+            }
+            $i++;
+        }
+        return $stack;
+    }
+    
+    static function friendlyErrorType($type) 
+    { 
+        switch($type) 
+        { 
+            case E_ERROR: // 1 // 
+                return 'E_ERROR'; 
+            case E_WARNING: // 2 // 
+                return 'E_WARNING'; 
+            case E_PARSE: // 4 // 
+                return 'E_PARSE'; 
+            case E_NOTICE: // 8 // 
+                return 'E_NOTICE'; 
+            case E_CORE_ERROR: // 16 // 
+                return 'E_CORE_ERROR'; 
+            case E_CORE_WARNING: // 32 // 
+                return 'E_CORE_WARNING'; 
+            case E_CORE_ERROR: // 64 // 
+                return 'E_COMPILE_ERROR'; 
+            case E_CORE_WARNING: // 128 // 
+                return 'E_COMPILE_WARNING'; 
+            case E_USER_ERROR: // 256 // 
+                return 'E_USER_ERROR'; 
+            case E_USER_WARNING: // 512 // 
+                return 'E_USER_WARNING'; 
+            case E_USER_NOTICE: // 1024 // 
+                return 'E_USER_NOTICE'; 
+            case E_STRICT: // 2048 // 
+                return 'E_STRICT'; 
+            case E_RECOVERABLE_ERROR: // 4096 // 
+                return 'E_RECOVERABLE_ERROR'; 
+            case E_DEPRECATED: // 8192 // 
+                return 'E_DEPRECATED'; 
+            case E_USER_DEPRECATED: // 16384 // 
+                return 'E_USER_DEPRECATED'; 
+        } 
+        return "UNKNOWN ERROR TYPE"; 
+    }
 }
 
 

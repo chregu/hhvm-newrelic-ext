@@ -1,4 +1,5 @@
 #include "hphp/runtime/base/base-includes.h"
+#include "hphp/runtime/ext/ext_error.h"
 #include "newrelic_transaction.h"
 #include "newrelic_collector_client.h"
 #include "newrelic_common.h"
@@ -117,6 +118,7 @@ static Variant HHVM_FUNCTION(newrelic_get_scoped_database_segment, const String 
 }
 
 const StaticString
+  s__NR_ERROR_CALLBACK("NewRelicExtensionHelper::errorCallback"),
   s__SERVER("_SERVER"),
   s__REQUEST_URI("REQUEST_URI"),
   s__SCRIPT_NAME("SCRIPT_NAME");
@@ -192,6 +194,7 @@ public:
 	}
 
 	virtual void requestInit() {
+		f_set_error_handler(s__NR_ERROR_CALLBACK);
 		//TODO: make it possible to disable that via ini
 		GlobalVariables *g = get_global_variables();
 		newrelic_transaction_begin();
