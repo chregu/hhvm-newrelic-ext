@@ -6,8 +6,10 @@ function newrelic_set_appname(string $name, string $key, bool $xmit): mixed {}
 //not implemented yet
 function newrelic_custom_metric(string $name, float $value) {}
 
-//not implemented yet
-function newrelic_add_custom_parameter(string $name, string $value) {}
+//The same as newrelic_add_attribute, but like in the officical NewRelic PHP API
+function newrelic_add_custom_parameter(string $name, string $value) {
+    newrelic_add_attribute_intern($name, $value);
+}
 
 //not implemented yet
 function newrelic_disable_autorum() {}
@@ -198,4 +200,6 @@ function newrelic_transaction_set_max_trace_segments(int $threshold): int;
 <<__Native>>
 function newrelic_notice_error_intern(string $exception_type, string $error_message, string $stack_trace, string $stack_frame_delimiter): int;
 
+<<__Native>>
+function newrelic_add_attribute_intern(string $name, string $value): int;
 
