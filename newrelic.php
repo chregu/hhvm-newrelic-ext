@@ -14,8 +14,20 @@ function newrelic_add_custom_parameter(string $name, string $value) {
 //not implemented yet
 function newrelic_disable_autorum() {}
 
-//not implemented yet
-function newrelic_notice_error(string $message, \Exception $e = null)  {}
+function newrelic_notice_error(string $error_message, \Exception $e = null)  {
+    if ($e) {
+        if (!$error_message) {
+            $error_message = $e->getMessage();
+        }
+        $exception_type = get_class($e);
+        $stack_trace = $e->getTraceAsString();
+    } else {
+        $exception_type = "";
+        $stack_trace = self::debug_backtrace_string();
+    }
+        $stack_frame_delimiter = "\n";
+    newrelic_notice_error_intern( $exception_type,  $error_message,  $stack_trace,  $stack_frame_delimiter);
+}
 
 //not implemented yet
 function newrelic_background_job(bool $true) {}
@@ -102,6 +114,13 @@ class NewRelicExtensionHelper {
         return false;
     }
     
+    static function exceptionCallback($e) {
+        $exception_type = get_class($e);
+        $error_message = $e->getMessage();
+        $stack_trace = $e->getTraceAsString();
+        $stack_frame_delimiter = "\n";
+        newrelic_notice_error_intern( $exception_type,  $error_message,  $stack_trace,  $stack_frame_delimiter);
+    }
     
     static function debug_backtrace_string() {
         $stack = '';
@@ -110,7 +129,10 @@ class NewRelicExtensionHelper {
         unset($trace[0]); //Remove call to this function from stack trace
         foreach($trace as $key => $node) {
             
-            $stack .= "#$i ".$node['file'] ."(" .$node['line']."): ";
+            $stack .= "#$i ";
+            if (isset($node['file'])) {
+                $stack .= $node['file'] ."(" .$node['line']."): ";
+            }
             if ($key > 1) {
                 if(isset($node['class'])) {
                     $stack .= $node['class'] . "->"; 
