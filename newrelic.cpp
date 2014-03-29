@@ -205,9 +205,9 @@ public:
 		//TODO: make it possible to disable that via ini
 		GlobalVariables *g = get_global_variables();
 		newrelic_transaction_begin();
-		String request_url = g->get(s__SERVER)[s__REQUEST_URI].toString();
+		String request_url = g->get(s__SERVER).toArray()[s__REQUEST_URI].toString();
 		newrelic_transaction_set_request_url(NEWRELIC_AUTOSCOPE, request_url.c_str());
-		String script_name = g->get(s__SERVER)[s__SCRIPT_NAME].toString();
+		String script_name = g->get(s__SERVER).toArray()[s__SCRIPT_NAME].toString();
 		newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, script_name.c_str());
 	}
 
