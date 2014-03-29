@@ -23,7 +23,7 @@ function newrelic_notice_error(string $error_message, \Exception $e = null)  {
         $stack_trace = $e->getTraceAsString();
     } else {
         $exception_type = "";
-        $stack_trace = self::debug_backtrace_string();
+        $stack_trace = NewRelicExtensionHelper::debug_backtrace_string();
     }
         $stack_frame_delimiter = "\n";
     newrelic_notice_error_intern( $exception_type,  $error_message,  $stack_trace,  $stack_frame_delimiter);
