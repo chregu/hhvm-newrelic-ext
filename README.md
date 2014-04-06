@@ -1,6 +1,6 @@
 # Installation  
 
-See also http://blog.newrelic.com/2014/02/10/agentsdk-blog-post/
+See also http://blog.newrelic.com/2014/02/10/agentsdk-blog-post/ and http://blog.liip.ch/archive/2014/03/27/hhvm-and-new-relic.htm
 
 * Download the Agent SDK http://download.newrelic.com/agent_sdk/
 * Copy the library files to /usr/lib or /usr/local/lib
@@ -26,7 +26,7 @@ Set the newrelic path under the DynamicExtensions section to the library that yo
 
 Restart hhvm
 
-# Using Auto-Instrumentation/Profiling (?)
+# Using Auto-Instrumentation/Profiling
 
 You have to build hhvm with HOTPROFILE support
 
