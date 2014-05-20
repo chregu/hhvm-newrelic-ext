@@ -14,7 +14,7 @@ function newrelic_add_custom_parameter(string $name, string $value) {
 //not implemented yet
 function newrelic_disable_autorum() {}
 
-function newrelic_notice_error(string $error_message, \Exception $e = null)  {
+function newrelic_notice_error(?string $error_message, \Exception $e = null)  {
     if ($e) {
         if (!$error_message) {
             $error_message = $e->getMessage();
