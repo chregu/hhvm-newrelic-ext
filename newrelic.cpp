@@ -1,5 +1,6 @@
 #include "hphp/runtime/base/base-includes.h"
-#include "hphp/runtime/ext/ext_error.h"
+#include "hphp/runtime/ext/std/ext_std_errorfunc.h"
+#include "hphp/runtime/base/php-globals.h"
 #include "newrelic_transaction.h"
 #include "newrelic_collector_client.h"
 #include "newrelic_common.h"
@@ -82,7 +83,8 @@ static int HHVM_FUNCTION(newrelic_transaction_set_max_trace_segments, int thresh
 }
 
 static int HHVM_FUNCTION(newrelic_transaction_set_threshold, int threshold) {
-	return newrelic_transaction_set_threshold(NEWRELIC_AUTOSCOPE, threshold);
+    //deprecated
+    return false;
 }
 
 static int HHVM_FUNCTION(newrelic_end_transaction) {
@@ -139,34 +141,20 @@ public:
 		newrelic_init(license_key.c_str(), app_name.c_str(), app_language.c_str(), app_language_version.c_str());
 	}
 
-	virtual void moduleLoad(Hdf config) {
+	virtual void moduleLoad(const IniSetting::Map& ini, Hdf config) {
 		if (!config.exists("EnvVariables")) return;
 
 		Hdf env_vars = config["EnvVariables"];
 
-		// Make any environment variables set in the hdf file available to the
-		// new relic libraries if the names start with NEWRELIC
-		for (Hdf child = env_vars.firstChild(); child.exists(); child = child.next()) {
-			std::string name = child.getName();
-			std::string val = env_vars[name].getString();
-			std::string newrelic_namespace("NEWRELIC");
+        license_key = Config::GetString(ini, env_vars["NEWRELIC_LICENSE_KEY"]);
+        app_name = Config::GetString(ini, env_vars["NEWRELIC_APP_NAME"]);
+        app_language = Config::GetString(ini, env_vars["NEWRELIC_APP_LANGUAGE"]);
+        app_language_version = Config::GetString(ini, env_vars["NEWRELIC_APP_LANGUAGE_VERSION"]);
 
-			if (name.compare(0, newrelic_namespace.length(), newrelic_namespace) == 0) {
-				if (name == "NEWRELIC_LICENSE_KEY") {
-					license_key = val;
-				} else if (name == "NEWRELIC_APP_NAME") {
-					app_name = val;
-				} else if (name == "NEWRELIC_APP_LANGUAGE") {
-					app_language = val;
-				} else if (name == "NEWRELIC_APP_LANGUAGE_VERSION") {
-					app_language_version = val;
-				}
-
-				// make the environment variable accessible elsewhere...
-				setenv(name.c_str(), val.c_str(), 1);
-			}
-
-		}
+        setenv("NEWRELIC_LICENSE_KEY", license_key.c_str(), 1);
+        setenv("NEWRELIC_APP_NAME", app_name.c_str(), 1);
+        setenv("NEWRELIC_APP_LANGUAGE", app_language.c_str(), 1);
+        setenv("NEWRELIC_APP_LANGUAGE_VERSION", app_language_version.c_str(), 1);
 
 		if (!license_key.empty() && !app_name.empty() && !app_language.empty() && !app_language_version.empty())
 			config_loaded = true;
@@ -193,9 +181,9 @@ public:
 
 		loadSystemlib();
 	}
-	
+
 	virtual void requestShutdown() {
-		
+
 		newrelic_transaction_end(NEWRELIC_AUTOSCOPE);
 	}
 
@@ -203,11 +191,10 @@ public:
 		f_set_error_handler(s__NR_ERROR_CALLBACK);
 		f_set_exception_handler(s__NR_EXCEPTION_CALLBACK);
 		//TODO: make it possible to disable that via ini
-		GlobalVariables *g = get_global_variables();
 		newrelic_transaction_begin();
-		String request_url = g->get(s__SERVER).toArray()[s__REQUEST_URI].toString();
+		String request_url = php_global(s__SERVER).toArray()[s__REQUEST_URI].toString();
 		newrelic_transaction_set_request_url(NEWRELIC_AUTOSCOPE, request_url.c_str());
-		String script_name = g->get(s__SERVER).toArray()[s__SCRIPT_NAME].toString();
+		String script_name = php_global(s__SERVER).toArray()[s__SCRIPT_NAME].toString();
 		newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, script_name.c_str());
 	}
 
