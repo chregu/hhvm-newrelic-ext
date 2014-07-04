@@ -30,7 +30,8 @@ Restart hhvm
 
 You have to build hhvm with HOTPROFILE support
 
-* Check out my hhvm branch with newrelic-profiling support 
+* Follow the Installation prerequisites for the normal plugin, copying the newrelic agent_sdk library and header files to their necesary location
+* Check out my hhvm branch with newrelic-profiling support
 * Go to your hhvm sources
 
 ```` 
