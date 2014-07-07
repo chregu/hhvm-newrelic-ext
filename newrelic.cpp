@@ -70,24 +70,24 @@ static int64_t HHVM_FUNCTION(newrelic_start_transaction_intern) {
     return transaction_id;
 }
 
-static int HHVM_FUNCTION(newrelic_name_transaction_intern, const String & name) {
+static int64_t HHVM_FUNCTION(newrelic_name_transaction_intern, const String & name) {
     return newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, name.c_str());
 }
 
-static int HHVM_FUNCTION(newrelic_transaction_set_request_url, const String & request_url) {
+static int64_t HHVM_FUNCTION(newrelic_transaction_set_request_url, const String & request_url) {
     return newrelic_transaction_set_request_url(NEWRELIC_AUTOSCOPE, request_url.c_str());
 }
 
-static int HHVM_FUNCTION(newrelic_transaction_set_max_trace_segments, int threshold) {
+static int64_t HHVM_FUNCTION(newrelic_transaction_set_max_trace_segments, int threshold) {
     return newrelic_transaction_set_max_trace_segments(NEWRELIC_AUTOSCOPE, threshold);
 }
 
-static int HHVM_FUNCTION(newrelic_transaction_set_threshold, int threshold) {
+static int64_t HHVM_FUNCTION(newrelic_transaction_set_threshold, int threshold) {
     //deprecated
     return false;
 }
 
-static int HHVM_FUNCTION(newrelic_end_transaction) {
+static int64_t HHVM_FUNCTION(newrelic_end_transaction) {
     return newrelic_transaction_end(NEWRELIC_AUTOSCOPE);
 }
 
@@ -99,15 +99,15 @@ static int64_t HHVM_FUNCTION(newrelic_segment_datastore_begin, const String & ta
     return newrelic_segment_datastore_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, table.c_str(), operation.c_str());
 }
 
-static int HHVM_FUNCTION(newrelic_segment_end, int64_t id) {
+static int64_t HHVM_FUNCTION(newrelic_segment_end, int64_t id) {
     return newrelic_segment_end(NEWRELIC_AUTOSCOPE, id);
 }
 
-static int HHVM_FUNCTION(newrelic_notice_error_intern, const String & exception_type,  const String & error_message,  const String & stack_trace,  const String & stack_frame_delimiter) {
+static int64_t HHVM_FUNCTION(newrelic_notice_error_intern, const String & exception_type,  const String & error_message,  const String & stack_trace,  const String & stack_frame_delimiter) {
     return newrelic_transaction_notice_error(NEWRELIC_AUTOSCOPE, exception_type.c_str(), error_message.c_str(), stack_trace.c_str(), stack_frame_delimiter.c_str());
 }
 
-static int HHVM_FUNCTION(newrelic_add_attribute_intern, const String & name, const String & value) {
+static int64_t HHVM_FUNCTION(newrelic_add_attribute_intern, const String & name, const String & value) {
     return newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, name.c_str(), value.c_str());
 }
 
