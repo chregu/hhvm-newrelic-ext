@@ -6,7 +6,7 @@ include_directories(/usr/include)
 include_directories(/usr/local/include)
 
 HHVM_EXTENSION(newrelic newrelic.cpp)
-HHVM_SYSTEMLIB(newrelic newrelic.php)
+HHVM_SYSTEMLIB(newrelic ext_newrelic.php)
 
 target_link_libraries(newrelic
 	${NEWRELIC_TRANSACTION_LIBRARY}
