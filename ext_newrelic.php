@@ -42,6 +42,12 @@ function newrelic_name_transaction(string $name) {
     newrelic_transaction_set_request_url($_SERVER["REQUEST_URI"]);
 }
 
+//not implemented yet
+function newrelic_ignore_transaction() {)
+
+//not implemented yet
+function newrelic_ignore_apdex() {)
+
 function newrelic_profiling_enable(int $level) {
     if (function_exists("newrelic_hotprofiling_enabled_intern")) {
         xhprof_enable(256,array(0 => $level));
@@ -60,6 +66,20 @@ function newrelic_profiling_disable() {
     }
 }
 
+//not implemented yet
+function newrelic_capture_params($enable) ()
+
+//not implemented yet
+function newrelic_get_browser_timing_header($flag) {}
+
+//not implemented yet
+function newrelic_get_browser_timing_footer($flag) {}
+
+//not implemented yet
+function newrelic_get_browser_timing_header() {}
+
+//not implemented yet
+function newrelic_set_user_attributes($user, $account, $product) {}
 
 class NewRelicExtensionHelper {
 
