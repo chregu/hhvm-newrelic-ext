@@ -35,7 +35,7 @@ public:
     }
 
 private:
-    long segment_id;
+    int64_t segment_id;
     string name;
 };
 
@@ -58,7 +58,7 @@ public:
     }
 
 private:
-    long segment_id;
+    int64_t segment_id;
     string table;
     string operation;
 };
@@ -66,7 +66,7 @@ private:
 void ScopedDatastoreSegment::sweep() { }
 
 static int64_t HHVM_FUNCTION(newrelic_start_transaction_intern) {
-    long transaction_id = newrelic_transaction_begin();
+    int64_t transaction_id = newrelic_transaction_begin();
     return transaction_id;
 }
 
@@ -203,7 +203,7 @@ private:
     std::string app_name;
     std::string app_language;
     std::string app_language_version;
-    long global_transaction_id = 0;
+    int64_t global_transaction_id = 0;
     bool config_loaded;
 
 } s_newrelic_extension;
