@@ -43,10 +43,10 @@ function newrelic_name_transaction(string $name) {
 }
 
 //not implemented yet
-function newrelic_ignore_transaction() {)
+function newrelic_ignore_transaction() {}
 
 //not implemented yet
-function newrelic_ignore_apdex() {)
+function newrelic_ignore_apdex() {}
 
 function newrelic_profiling_enable(int $level) {
     if (function_exists("newrelic_hotprofiling_enabled_intern")) {
@@ -67,7 +67,7 @@ function newrelic_profiling_disable() {
 }
 
 //not implemented yet
-function newrelic_capture_params($enable) ()
+function newrelic_capture_params($enable) () {}
 
 //not implemented yet
 function newrelic_get_browser_timing_header($flag) {}
