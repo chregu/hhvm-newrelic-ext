@@ -67,16 +67,13 @@ function newrelic_profiling_disable() {
 }
 
 //not implemented yet
-function newrelic_capture_params($enable) () {}
+function newrelic_capture_params($enable) {}
 
 //not implemented yet
 function newrelic_get_browser_timing_header($flag) {}
 
 //not implemented yet
 function newrelic_get_browser_timing_footer($flag) {}
-
-//not implemented yet
-function newrelic_get_browser_timing_header() {}
 
 //not implemented yet
 function newrelic_set_user_attributes($user, $account, $product) {}
