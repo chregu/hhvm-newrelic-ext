@@ -32,14 +32,27 @@ function newrelic_notice_error(?string $error_message, \Exception $e = null)  {
 //not implemented yet
 function newrelic_background_job(bool $true) {}
 
-function newrelic_start_transaction(string $appname, string $license = null) {
-    newrelic_start_transaction_intern();
+function newrelic_transaction_begin(): int {
+    return newrelic_start_transaction();
+}
+
+function newrelic_transaction_end(): int {
+    return newrelic_end_transaction();
+}
+
+function newrelic_start_transaction(string $appname = null, string $license = null): int {
+    $id = newrelic_start_transaction_intern();
     newrelic_transaction_set_request_url($_SERVER["REQUEST_URI"]);
+    return $id;
 }
 
 function newrelic_name_transaction(string $name) {
     newrelic_name_transaction_intern($name);
     newrelic_transaction_set_request_url($_SERVER["REQUEST_URI"]);
+}
+
+function newrelic_transaction_set_name(string $name) {
+    newrelic_name_transaction($name);
 }
 
 //not implemented yet
@@ -225,6 +238,9 @@ function newrelic_segment_generic_begin(string $name): int;
 function newrelic_segment_datastore_begin(string $table, string $operation): int;
 
 <<__Native>>
+function newrelic_segment_external_begin(string $host, string $name): int;
+
+<<__Native>>
 function newrelic_segment_end(int $id): int;
 
 <<__Native>>
@@ -232,6 +248,9 @@ function newrelic_get_scoped_generic_segment(string $name): mixed;
 
 <<__Native>>
 function newrelic_get_scoped_database_segment(string $table, string $operation): mixed;
+
+<<__Native>>
+function newrelic_get_scoped_external_segment(string $host, string $name): mixed;
 
 <<__Native>>
 function newrelic_transaction_set_max_trace_segments(int $threshold): int;
