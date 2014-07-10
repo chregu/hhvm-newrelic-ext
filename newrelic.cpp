@@ -65,6 +65,32 @@ private:
 
 void ScopedDatastoreSegment::sweep() { }
 
+
+class ScopedExternalSegment : public SweepableResourceData {
+public:
+    DECLARE_RESOURCE_ALLOCATION(ScopedExternalSegment)
+    CLASSNAME_IS("scoped_external_segment")
+
+    virtual const String& o_getClassNameHook() const { return classnameof(); }
+
+    explicit ScopedExternalSegment(string host, string name) : host(host), name(name) {
+        segment_id = newrelic_segment_external_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, host.c_str(), name.c_str());
+    }
+
+    virtual ~ScopedExternalSegment() {
+        if (segment_id < 0) return;
+        newrelic_segment_end(NEWRELIC_AUTOSCOPE, segment_id);
+    }
+
+private:
+    int64_t segment_id;
+    string host;
+    string name;
+};
+
+void ScopedExternalSegment::sweep() { }
+
+
 static int64_t HHVM_FUNCTION(newrelic_start_transaction_intern) {
     int64_t transaction_id = newrelic_transaction_begin();
     return transaction_id;
@@ -99,6 +125,10 @@ static int64_t HHVM_FUNCTION(newrelic_segment_datastore_begin, const String & ta
     return newrelic_segment_datastore_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, table.c_str(), operation.c_str());
 }
 
+static int64_t HHVM_FUNCTION(newrelic_segment_external_begin, const String & host, const String & name) {
+    return newrelic_segment_external_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, host.c_str(), name.c_str());
+}
+
 static int64_t HHVM_FUNCTION(newrelic_segment_end, int64_t id) {
     return newrelic_segment_end(NEWRELIC_AUTOSCOPE, id);
 }
@@ -120,6 +150,12 @@ static Variant HHVM_FUNCTION(newrelic_get_scoped_generic_segment, const String &
 static Variant HHVM_FUNCTION(newrelic_get_scoped_database_segment, const String & table, const String & operation) {
     ScopedDatastoreSegment * segment = nullptr;
     segment = NEWOBJ(ScopedDatastoreSegment)(table.c_str(), operation.c_str());
+    return Resource(segment);
+}
+
+static Variant HHVM_FUNCTION(newrelic_get_scoped_external_segment, const String & host, const String & name) {
+    ScopedExternalSegment * segment = nullptr;
+    segment = NEWOBJ(ScopedExternalSegment)(host.c_str(), name.c_str());
     return Resource(segment);
 }
 
@@ -173,9 +209,11 @@ public:
         HHVM_FE(newrelic_end_transaction);
         HHVM_FE(newrelic_segment_generic_begin);
         HHVM_FE(newrelic_segment_datastore_begin);
+        HHVM_FE(newrelic_segment_external_begin);
         HHVM_FE(newrelic_segment_end);
         HHVM_FE(newrelic_get_scoped_generic_segment);
         HHVM_FE(newrelic_get_scoped_database_segment);
+        HHVM_FE(newrelic_get_scoped_external_segment);
         HHVM_FE(newrelic_notice_error_intern);
         HHVM_FE(newrelic_add_attribute_intern);
 

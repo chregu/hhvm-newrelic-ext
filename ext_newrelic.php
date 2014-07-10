@@ -238,6 +238,9 @@ function newrelic_segment_generic_begin(string $name): int;
 function newrelic_segment_datastore_begin(string $table, string $operation): int;
 
 <<__Native>>
+function newrelic_segment_external_begin(string $host, string $name): int;
+
+<<__Native>>
 function newrelic_segment_end(int $id): int;
 
 <<__Native>>
@@ -245,6 +248,9 @@ function newrelic_get_scoped_generic_segment(string $name): mixed;
 
 <<__Native>>
 function newrelic_get_scoped_database_segment(string $table, string $operation): mixed;
+
+<<__Native>>
+function newrelic_get_scoped_external_segment(string $host, string $name): mixed;
 
 <<__Native>>
 function newrelic_transaction_set_max_trace_segments(int $threshold): int;
