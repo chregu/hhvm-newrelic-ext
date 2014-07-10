@@ -3,19 +3,19 @@ $loaded = extension_loaded("newrelic");
 
 print("newrelic loaded: ".$loaded."\n");
 
-print("newrelic_transaction_begin exists: ".function_exists("newrelic_transaction_begin")."\n");
+print("newrelic_start_transaction exists: ".function_exists("newrelic_start_transaction")."\n");
 print("newrelic_transaction_set_name exists: ".function_exists("newrelic_transaction_set_name")."\n");
 print("newrelic_transaction_set_request_url exists: ".function_exists("newrelic_transaction_set_request_url")."\n");
 print("newrelic_transaction_set_threshold exists: ".function_exists("newrelic_transaction_set_threshold")."\n");
-print("newrelic_transaction_end exists: ".function_exists("newrelic_transaction_end")."\n");
+print("newrelic_end_transaction exists: ".function_exists("newrelic_end_transaction")."\n");
 print("newrelic_segment_generic_begin exists: ".function_exists("newrelic_segment_generic_begin")."\n");
 print("newrelic_segment_datastore_begin exists: ".function_exists("newrelic_segment_datastore_begin")."\n");
 print("newrelic_segment_end exists: ".function_exists("newrelic_segment_end")."\n");
 
-$transaction_id = newrelic_transaction_begin();
+$transaction_id = newrelic_start_transaction();
 print("transaction_id: ".$transaction_id."\n");
 
-$name_error_code = newrelic_transaction_set_name("my_transaction");
+$name_error_code = newrelic_name_transaction("my_transaction");
 print("name_error_code: ".$name_error_code."\n");
 
 $request_url_error_code = newrelic_transaction_set_request_url("my/path");
@@ -39,5 +39,5 @@ print("datastore_end_error_code: ".$datastore_end_error_code."\n");
 $generic_end_error_code = newrelic_segment_end($generic_segment_id);
 print("generic_end_error_code: ".$generic_end_error_code."\n");
 
-$end_error_code = newrelic_transaction_end();
+$end_error_code = newrelic_end_transaction();
 print("end_error_code: ".$end_error_code."\n");
