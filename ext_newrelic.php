@@ -34,13 +34,17 @@ function newrelic_background_job(bool $true) {}
 
 function newrelic_start_transaction(string $appname = null, string $license = null): int {
     $id = newrelic_start_transaction_intern();
-    newrelic_transaction_set_request_url($_SERVER["REQUEST_URI"]);
+    if(isset($_SERVER["REQUEST_URI"])) {
+        newrelic_transaction_set_request_url($_SERVER["REQUEST_URI"]);
+    }
     return $id;
 }
 
 function newrelic_name_transaction(string $name) {
     newrelic_name_transaction_intern($name);
-    newrelic_transaction_set_request_url($_SERVER["REQUEST_URI"]);
+    if(isset($_SERVER["REQUEST_URI"])) {
+        newrelic_transaction_set_request_url($_SERVER["REQUEST_URI"]);
+    }
 }
 
 //not implemented yet
