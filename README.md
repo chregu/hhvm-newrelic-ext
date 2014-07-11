@@ -1,4 +1,8 @@
-# Installation  
+This extension tries to implement the New Relic PHP Plugin API with the help of the New Relic SDK.
+
+The PHP API can be found here: https://docs.newrelic.com/docs/php/php-agent-api
+
+# Installation
 
 See also http://blog.newrelic.com/2014/02/10/agentsdk-blog-post/ and http://blog.liip.ch/archive/2014/03/27/hhvm-and-new-relic.htm
 
@@ -34,7 +38,7 @@ You have to build hhvm with HOTPROFILE support
 * Check out my hhvm branch with newrelic-profiling support
 * Go to your hhvm sources
 
-```` 
+````
 git remote add chregu https://github.com/chregu/hhvm.git
 git checkout -b newrelic-profiling chregu/newrelic-profiling
 ````
@@ -44,6 +48,6 @@ git checkout -b newrelic-profiling chregu/newrelic-profiling
 ````
 cmake -D HOTPROFILER:BOOL=ON .
 make
-````     
+````
 (this can take a while and you need all the HHVM dependencies, see other places about that)
 
