@@ -253,3 +253,106 @@ function newrelic_notice_error_intern(string $exception_type, string $error_mess
 <<__Native>>
 function newrelic_add_attribute_intern(string $name, string $value): int;
 
+/**
+ *    Core Overrides
+ */
+
+// PDO intercepts
+function newrelic_pdo_intercept() {
+    // PDO::exec and PDO::query will be harder due to lifecycle of objects
+    //fb_intercept('PDO::exec', function ($name, $obj, $args, $data, &$done) { $done=false;});
+    //fb_intercept('PDO::query', function ($name, $obj, $args, $data, &$done) { $done=false;});
+    fb_intercept('PDOStatement::execute', function ($name, $obj, $args, $data, &$done) {
+        $segment = null;
+        $sql = $obj->queryString;
+        if (preg_match( '/^select/i', $sql)) {
+            if (preg_match("/\s+FROM\s+`?([a-z\d_]+)`?/i", $sql, $match)) {
+                $segment = newrelic_get_scoped_database_segment($match[1], 'select');
+            } else {
+                $segment = newrelic_get_scoped_database_segment('unknown', 'select');
+            }
+        } else if (preg_match( '/^insert/i', $sql)) {
+            if (preg_match("/\s+INTO\s+`?([a-z\d_]+)`?/i", $sql, $match)) {
+                $segment = newrelic_get_scoped_database_segment($match[1], 'insert');
+            } else {
+                $segment = newrelic_get_scoped_database_segment('unknown', 'insert');
+            }
+        } else if (preg_match( '/^update/i', $sql)) {
+            if (preg_match("/UPDATE\s+`?([a-z\d_]+)`?/i", $sql, $match)) {
+                $segment = newrelic_get_scoped_database_segment($match[1], 'update');
+	    } else {
+                $segment = newrelic_get_scoped_database_segment('unknown', 'update');
+            }
+        } else if (preg_match( '/^delete/i', $sql)) {
+            if (preg_match("/DELETE\s+`?([a-z\d_]+)`?/i", $sql, $match)) {
+                $segment = newrelic_get_scoped_database_segment($match[1], 'delete');
+            } else {
+                $segment = newrelic_get_scoped_database_segment('unknown', 'delete');
+            }
+        } else {
+            $segment = newrelic_get_scoped_database_segment('unknown', 'select');
+        }
+        $obj->_newrelic_segment = $segment;
+        $done=false;
+    });
+}
+
+// file_get_contents (e.g. solr)
+function newrelic_file_get_contents(string $filename, bool $use_include_path = false, resource $context = null, int $offset = -1, int $maxlen = -1) {
+    $seg = newrelic_segment_external_begin($filename, 'file_get_contents');
+    $resp = @obs_file_get_contents($filename, $use_include_path, $context, $offset, $maxlen);
+    newrelic_segment_end($seg);
+    return $resp;
+}
+
+function newrelic_file_get_contents_intercept() {
+    fb_rename_function('file_get_contents', 'obs_file_get_contents');
+    fb_rename_function('newrelic_file_get_contents', 'file_get_contents');
+}
+
+
+// fread and fwrite (e.g. Redis)
+function newrelic_fread(resource $handle, int $length) {
+    if (stream_get_meta_data($handle)['wrapper_type'] != 'plainfile') {
+        $seg = newrelic_segment_external_begin('sock_read[' . stream_socket_get_name($handle,true) . ']', 'fwread');
+    } else {
+        $seg = newrelic_segment_external_begin('file', 'fread');
+    }
+    $resp = @obs_fread($handle, $length);
+    newrelic_segment_end($seg);
+    return $resp;
+}
+
+function newrelic_fwrite( resource $handle, string $string, int $length = -1 ) {
+    if (stream_get_meta_data($handle)['wrapper_type'] != 'plainfile') {
+        $seg = newrelic_segment_external_begin('sock_write[' . stream_socket_get_name($handle,true) . ']', 'fwrite');
+    } else {
+        $seg = newrelic_segment_external_begin('file', 'fwrite');
+    }
+    $resp = @obs_fwrite($handle, $string, $length);
+    newrelic_segment_end($seg);
+    return $resp;
+}
+
+function newrelic_fread_fwrite_intercept() {
+    fb_rename_function('fread', 'obs_fread');
+    fb_rename_function('newrelic_fread', 'fread');
+
+    fb_rename_function('fwrite', 'obs_fwrite');
+    fb_rename_function('newrelic_fwrite', 'fwrite');
+}
+
+// curl
+function newrelic_curl_exec( resource $ch ) {
+    $url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+    $url = 'curl[' . substr($url, 0, strpos($url, '/', 8)) . ']';
+
+    $seg = newrelic_segment_external_begin($url, 'curl');
+    $resp = @obs_curl_exec($ch);
+    newrelic_segment_end($seg);
+    return $resp;
+}
+function newrelic_curl_intercept() {
+    fb_rename_function('curl_exec', 'obs_curl_exec');
+    fb_rename_function('newrelic_curl_exec', 'curl_exec');
+}
