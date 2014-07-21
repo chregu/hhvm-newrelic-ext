@@ -356,3 +356,48 @@ function newrelic_curl_intercept() {
     fb_rename_function('curl_exec', 'obs_curl_exec');
     fb_rename_function('newrelic_curl_exec', 'curl_exec');
 }
+
+// socket_read and socket_write (e.g. MongoDB (mongofill))
+function newrelic_socket_read(resource $socket, int $length, int $type = PHP_BINARY_READ) {
+    if (stream_get_meta_data($socket)['wrapper_type'] != 'plainfile') {
+        $seg = newrelic_segment_external_begin('sock_read[' . stream_socket_get_name($socket,true) . ']', 'socket_read');
+    } else {
+        $seg = newrelic_segment_external_begin('file', 'socket_read');
+    }
+    $resp = @obs_socket_read($socket, $length. $type);
+    newrelic_segment_end($seg);
+    return $resp;
+}
+
+function newrelic_socket_write( resource $socket, string $string, int $length = 0 ) {
+    if (stream_get_meta_data($socket)['wrapper_type'] != 'plainfile') {
+        $seg = newrelic_segment_external_begin('sock_write[' . stream_socket_get_name($socket,true) . ']', 'socket_write');
+    } else {
+        $seg = newrelic_segment_external_begin('file', 'socket_write');
+    }
+    $resp = @obs_socket_write($socket, $string, $length);
+    newrelic_segment_end($seg);
+    return $resp;
+}
+
+function newrelic_socket_recv( resource $socket , &$buf , int $len , int $flags ) {
+    if (stream_get_meta_data($socket)['wrapper_type'] != 'plainfile') {
+        $seg = newrelic_segment_external_begin('sock_read[' . stream_socket_get_name($socket,true) . ']', 'socket_read');
+    } else {
+        $seg = newrelic_segment_external_begin('file', 'socket_read');
+    }
+    $resp = obs_socket_recv($socket, $buf, $len, $flags);
+    newrelic_segment_end($seg);
+    return $resp;
+}
+
+function newrelic_socket_read_write_intercept() {
+    fb_rename_function('socket_read', 'obs_socket_read');
+    fb_rename_function('newrelic_socket_read', 'socket_read');
+
+    fb_rename_function('socket_write', 'obs_socket_write');
+    fb_rename_function('newrelic_socket_write', 'socket_write');
+
+    fb_rename_function('socket_recv', 'obs_socket_recv');
+    fb_rename_function('newrelic_socket_recv', 'socket_recv');
+}

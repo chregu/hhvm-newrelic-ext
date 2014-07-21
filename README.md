@@ -75,5 +75,6 @@ Include these functions somewhere in your application's entry script.
 newrelic_file_get_contents_intercept();
 newrelic_fread_fwrite_intercept();
 newrelic_curl_intercept();
+newrelic_socket_read_write_intercept();
 ````
 
