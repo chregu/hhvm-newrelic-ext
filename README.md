@@ -57,6 +57,7 @@ For PDO / Datastore segments:
 Include this function somewhere in your application's entry script.
 ````
 newrelic_pdo_intercept();
+newrelic_mysqli_intercept();
 ````
 
 For External services through curl, file_get_contents, and fwrite/fread:

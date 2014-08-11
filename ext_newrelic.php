@@ -257,45 +257,83 @@ function newrelic_add_attribute_intern(string $name, string $value): int;
  *    Core Overrides
  */
 
+// sql helper/parser
+function _newrelic_parse_query($query): array {
+	if (preg_match( '/^\s*SELECT/i', $query)) {
+		if (preg_match('/\s+FROM\s+[`\'"]?([a-z\d_]+)[`\'"]?/i', $query, $match)) {
+			return ['select', $match[1]];
+		} else {
+			return ['select', 'unknown'];
+		}
+	} else if (preg_match( '/^\s*INSERT/i', $query)) {
+		if (preg_match('/\s+INTO\s+[`\'"]?([a-z\d_]+)[`\'"]?/i', $query, $match)) {
+			return ['insert', $match[1]];
+		} else {
+			return ['insert', 'unknown'];
+		}
+	} else if (preg_match( '/^\s*UPDATE/i', $query)) {
+		if (preg_match('/UPDATE\s+[`\'"]?([a-z\d_]+)[`\'"]?/i', $query, $match)) {
+			return ['update', $match[1]];
+		} else {
+			return ['update', 'unknown'];
+		}
+	} else if (preg_match( '/^\s*DELETE/i', $query)) {
+		if (preg_match('/DELETE\s+[`\'"]?([a-z\d_]+)[`\'"]?/i', $query, $match)) {
+			return ['delete', $match[1]];
+		} else {
+			return ['delete', 'unknown'];
+		}
+	} else if (preg_match( '/^\s*SHOW/i', $query)) {
+		if (preg_match('/^\s*?(SHOW\s+[a-z\d_]+)/i', $query, $match)) {
+			return ['select', $match[1]];
+		} else {
+			return ['select', 'SHOW'];
+		}
+	}
+	return ['select', 'undefined'];
+}
+
 // PDO intercepts
 function newrelic_pdo_intercept() {
     // PDO::exec and PDO::query will be harder due to lifecycle of objects
     //fb_intercept('PDO::exec', function ($name, $obj, $args, $data, &$done) { $done=false;});
     //fb_intercept('PDO::query', function ($name, $obj, $args, $data, &$done) { $done=false;});
     fb_intercept('PDOStatement::execute', function ($name, $obj, $args, $data, &$done) {
-        $segment = null;
-        $sql = $obj->queryString;
-        if (preg_match( '/^select/i', $sql)) {
-            if (preg_match("/\s+FROM\s+`?([a-z\d_]+)`?/i", $sql, $match)) {
-                $segment = newrelic_get_scoped_database_segment($match[1], 'select');
-            } else {
-                $segment = newrelic_get_scoped_database_segment('unknown', 'select');
-            }
-        } else if (preg_match( '/^insert/i', $sql)) {
-            if (preg_match("/\s+INTO\s+`?([a-z\d_]+)`?/i", $sql, $match)) {
-                $segment = newrelic_get_scoped_database_segment($match[1], 'insert');
-            } else {
-                $segment = newrelic_get_scoped_database_segment('unknown', 'insert');
-            }
-        } else if (preg_match( '/^update/i', $sql)) {
-            if (preg_match("/UPDATE\s+`?([a-z\d_]+)`?/i", $sql, $match)) {
-                $segment = newrelic_get_scoped_database_segment($match[1], 'update');
-	    } else {
-                $segment = newrelic_get_scoped_database_segment('unknown', 'update');
-            }
-        } else if (preg_match( '/^delete/i', $sql)) {
-            if (preg_match("/DELETE\s+`?([a-z\d_]+)`?/i", $sql, $match)) {
-                $segment = newrelic_get_scoped_database_segment($match[1], 'delete');
-            } else {
-                $segment = newrelic_get_scoped_database_segment('unknown', 'delete');
-            }
-        } else {
-            $segment = newrelic_get_scoped_database_segment('unknown', 'select');
-        }
-        $obj->_newrelic_segment = $segment;
+        $query = $obj->queryString;
+        $a = _newrelic_parse_query($query);
+        
+        $obj->_newrelic_segment = newrelic_get_scoped_database_segment($a[1], $a[0]);
         $done=false;
     });
 }
+
+// mysqli
+function newrelic_mysqli_intercept() {
+    fb_intercept('mysqli::hh_real_query', function ($name, $obj, $args, $data, &$done) {
+        if (isset($obj->_newrelic_segment) && $obj->_newrelic_segment) {
+                newrelic_segment_end($obj->_newrelic_segment);
+        }
+        $query = $args[0];
+        $a = _newrelic_parse_query($query);
+
+        $obj->_newrelic_segment = newrelic_segment_datastore_begin($a[1], $a[0]);
+        $done = false;
+    });
+    
+    fb_intercept('mysqli::store_result', '_newrelic_mysqli_segment_end');
+
+    fb_intercept('mysqli::use_result', '_newrelic_mysqli_segment_end');
+}
+function _newrelic_mysqli_segment_end($name, $obj, $args, $data, &$done) {
+    if (isset($obj->_newrelic_segment) && $obj->_newrelic_segment) {
+            newrelic_segment_end($obj->_newrelic_segment);
+    }
+    $obj->_newrelic_segment = 0;
+    $done = false;
+}
+
+
+
 
 // file_get_contents (e.g. solr)
 function newrelic_file_get_contents(string $filename, bool $use_include_path = false, resource $context = null, int $offset = -1, int $maxlen = -1) {
@@ -401,3 +439,4 @@ function newrelic_socket_read_write_intercept() {
     fb_rename_function('socket_recv', 'obs_socket_recv');
     fb_rename_function('newrelic_socket_recv', 'socket_recv');
 }
+
