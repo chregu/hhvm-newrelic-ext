@@ -352,7 +352,7 @@ function newrelic_file_get_contents_intercept() {
 // fread and fwrite (e.g. Redis)
 function newrelic_fread(resource $handle, int $length) {
     if (stream_get_meta_data($handle)['wrapper_type'] != 'plainfile') {
-        $seg = newrelic_segment_external_begin('sock_read[' . stream_socket_get_name($handle,true) . ']', 'fwread');
+        $seg = newrelic_segment_external_begin('sock_read[' . stream_socket_get_name($handle,true) . ']', 'fread');
     } else {
         $seg = newrelic_segment_external_begin('file', 'fread');
     }
