@@ -178,14 +178,20 @@ public:
     }
 
     virtual void moduleLoad(const IniSetting::Map& ini, Hdf config) {
-        if (!config.exists("EnvVariables")) return;
 
-        Hdf env_vars = config["EnvVariables"];
+        license_key = RuntimeOption::EnvVariables["NEWRELIC_LICENSE_KEY"];
+        app_name = RuntimeOption::EnvVariables["NEWRELIC_APP_NAME"];
+        app_language = RuntimeOption::EnvVariables["NEWRELIC_APP_LANGUAGE"];
+        app_language_version = RuntimeOption::EnvVariables["NEWRELIC_APP_LANGUAGE_VERSION"];
 
-        license_key = Config::GetString(ini, env_vars["NEWRELIC_LICENSE_KEY"]);
-        app_name = Config::GetString(ini, env_vars["NEWRELIC_APP_NAME"]);
-        app_language = Config::GetString(ini, env_vars["NEWRELIC_APP_LANGUAGE"]);
-        app_language_version = Config::GetString(ini, env_vars["NEWRELIC_APP_LANGUAGE_VERSION"]);
+        if (app_language.empty()) {
+            app_language = "php-hhvm";
+        }
+
+        if (app_language_version.empty()) {
+            app_language_version = HPHP::getHphpCompilerVersion();
+        }
+
 
         setenv("NEWRELIC_LICENSE_KEY", license_key.c_str(), 1);
         setenv("NEWRELIC_APP_NAME", app_name.c_str(), 1);
