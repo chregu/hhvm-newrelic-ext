@@ -5,7 +5,8 @@ find_library(NEWRELIC_COMMON_LIBRARY NAMES newrelic-common PATHS /usr/lib /usr/l
 include_directories(/usr/include)
 include_directories(/usr/local/include)
 
-HHVM_EXTENSION(newrelic newrelic.cpp)
+
+HHVM_EXTENSION(newrelic newrelic.cpp newrelic_profiler.cpp)
 HHVM_SYSTEMLIB(newrelic ext_newrelic.php)
 
 target_link_libraries(newrelic

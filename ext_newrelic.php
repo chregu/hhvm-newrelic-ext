@@ -54,12 +54,15 @@ function newrelic_ignore_transaction() {}
 function newrelic_ignore_apdex() {}
 
 function newrelic_profiling_enable(int $level) {
+    //hotprofiler_enable(0x400)
+    xhprof_enable(0x400,array(0 => $level));
+    /*
     if (function_exists("newrelic_hotprofiling_enabled_intern")) {
-        xhprof_enable(0x800,array(0 => $level));
+        xhprof_enable(0x400,array(0 => $level));
     } else {
         NewRelicExtensionHelper::setMaxDepth($level);
         fb_setprofile(array("NewRelicExtensionHelper","profile"));
-    }
+    }*/
 }
 
 function newrelic_profiling_disable() {

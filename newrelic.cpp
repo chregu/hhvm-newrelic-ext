@@ -1,9 +1,11 @@
 #include "hphp/runtime/base/base-includes.h"
 #include "hphp/runtime/ext/std/ext_std_errorfunc.h"
 #include "hphp/runtime/base/php-globals.h"
+#include "hphp/runtime/ext/ext_hotprofiler.h"
 #include "newrelic_transaction.h"
 #include "newrelic_collector_client.h"
 #include "newrelic_common.h"
+#include "newrelic_profiler.h"
 
 #include <string>
 #include <iostream>
@@ -49,7 +51,7 @@ public:
     virtual const String& o_getClassNameHook() const { return classnameof(); }
 
     explicit ScopedDatastoreSegment(string table, string operation) : table(table), operation(operation) {
-        segment_id = newrelic_segment_datastore_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, table.c_str(), operation.c_str());
+// TODO        segment_id = newrelic_segment_datastore_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, table.c_str(), operation.c_str());
     }
 
     virtual ~ScopedDatastoreSegment() {
@@ -90,6 +92,8 @@ private:
 
 void ScopedExternalSegment::sweep() { }
 
+// Profiler factory- for starting and stopping the profiler
+DECLARE_EXTERN_REQUEST_LOCAL(ProfilerFactory, s_profiler_factory);
 
 static int64_t HHVM_FUNCTION(newrelic_start_transaction_intern) {
     int64_t transaction_id = newrelic_transaction_begin();
@@ -121,8 +125,9 @@ static int64_t HHVM_FUNCTION(newrelic_segment_generic_begin, const String & name
     return newrelic_segment_generic_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, name.c_str());
 }
 
-static int64_t HHVM_FUNCTION(newrelic_segment_datastore_begin, const String & table, const String & operation) {
-    return newrelic_segment_datastore_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, table.c_str(), operation.c_str());
+static int64_t HHVM_FUNCTION(newrelic_segment_datastore_begin, const String & table, const String & operation, const String & sql, const String & sql_trace_rollup_name, String & sql_obfuscator) {
+// TODO    return newrelic_segment_datastore_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, table.c_str(), operation.c_str(), sql.c_str(), sql_trace_rollup_name.c_str(), sql_obfuscator.c_str());
+    return false;
 }
 
 static int64_t HHVM_FUNCTION(newrelic_segment_external_begin, const String & host, const String & name) {
@@ -218,6 +223,10 @@ public:
         HHVM_FE(newrelic_add_attribute_intern);
 
         loadSystemlib();
+
+        Profiler *p = new NewRelicProfiler(0);
+        ProfilerFactory *pf = new ProfilerFactory();
+        pf->setExternalProfiler(p);
     }
 
     virtual void requestShutdown() {
