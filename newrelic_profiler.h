@@ -12,27 +12,28 @@
 namespace HPHP {
     ///////////////////////////////////////////////////////////////////////////////
 
+    const StaticString
+    s__SERVER("_SERVER"),
+    s__REQUEST_URI("REQUEST_URI"),
+    s__SCRIPT_NAME("SCRIPT_NAME"),
+    s__NEWRELIC("newrelic");
 
     class NewRelicProfiler : public Profiler {
 
         public:
-        explicit NewRelicProfiler(int flags) : m_flags(flags) {
-                max_depth = flags;
+        explicit NewRelicProfiler(int64_t mdepth) : max_depth(mdepth)  {
         }
 
 
         virtual void beginFrameEx(const char *symbol);
-        virtual void endFrameEx(const TypedValue *retval,
-                          const char *given_symbol);
-        virtual void endAllFrames();
+        virtual void endFrameEx(const TypedValue *retval, const char *given_symbol);
         private:
 
-        typedef hphp_hash_map<std::string, string_hash> StatsMap;
-          StatsMap m_stats; // outcome
 
-        int max_depth;
-        uint32_t m_flags;
+        int64_t max_depth;
+
     };
+
 
 
 

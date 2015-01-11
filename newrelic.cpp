@@ -146,6 +146,11 @@ static int64_t HHVM_FUNCTION(newrelic_add_attribute_intern, const String & name,
     return newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, name.c_str(), value.c_str());
 }
 
+static void HHVM_FUNCTION(newrelic_set_external_profiler, int64_t maxdepth ) {
+    Profiler *pr = new NewRelicProfiler(maxdepth);
+    s_profiler_factory->setExternalProfiler(pr);
+}
+
 static Variant HHVM_FUNCTION(newrelic_get_scoped_generic_segment, const String & name) {
     ScopedGenericSegment * segment = nullptr;
     segment = NEWOBJ(ScopedGenericSegment)(name.c_str());
@@ -166,10 +171,7 @@ static Variant HHVM_FUNCTION(newrelic_get_scoped_external_segment, const String 
 
 const StaticString
   s__NR_ERROR_CALLBACK("NewRelicExtensionHelper::errorCallback"),
-  s__NR_EXCEPTION_CALLBACK("NewRelicExtensionHelper::exceptionCallback"),
-  s__SERVER("_SERVER"),
-  s__REQUEST_URI("REQUEST_URI"),
-  s__SCRIPT_NAME("SCRIPT_NAME");
+  s__NR_EXCEPTION_CALLBACK("NewRelicExtensionHelper::exceptionCallback");
 
 static class NewRelicExtension : public Extension {
 public:
@@ -221,12 +223,9 @@ public:
         HHVM_FE(newrelic_get_scoped_external_segment);
         HHVM_FE(newrelic_notice_error_intern);
         HHVM_FE(newrelic_add_attribute_intern);
+        HHVM_FE(newrelic_set_external_profiler);
 
         loadSystemlib();
-
-        Profiler *p = new NewRelicProfiler(0);
-        ProfilerFactory *pf = new ProfilerFactory();
-        pf->setExternalProfiler(p);
     }
 
     virtual void requestShutdown() {

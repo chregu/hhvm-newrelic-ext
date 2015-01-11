@@ -42,10 +42,4 @@ namespace HPHP {
         }
     }
 
-    void NewRelicProfiler::endAllFrames() {
-        while (m_stack) {
-            endFrame(nullptr, nullptr, true);
-        }
-    }
-
 }
