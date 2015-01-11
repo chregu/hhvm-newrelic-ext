@@ -153,19 +153,19 @@ static void HHVM_FUNCTION(newrelic_set_external_profiler, int64_t maxdepth ) {
 
 static Variant HHVM_FUNCTION(newrelic_get_scoped_generic_segment, const String & name) {
     ScopedGenericSegment * segment = nullptr;
-    segment = NEWOBJ(ScopedGenericSegment)(name.c_str());
+    segment = newres<ScopedGenericSegment>(name.c_str());
     return Resource(segment);
 }
 
 static Variant HHVM_FUNCTION(newrelic_get_scoped_database_segment, const String & table, const String & operation) {
     ScopedDatastoreSegment * segment = nullptr;
-    segment = NEWOBJ(ScopedDatastoreSegment)(table.c_str(), operation.c_str());
+    segment = newres<ScopedDatastoreSegment>(table.c_str(), operation.c_str());
     return Resource(segment);
 }
 
 static Variant HHVM_FUNCTION(newrelic_get_scoped_external_segment, const String & host, const String & name) {
     ScopedExternalSegment * segment = nullptr;
-    segment = NEWOBJ(ScopedExternalSegment)(host.c_str(), name.c_str());
+    segment = newres<ScopedExternalSegment>(host.c_str(), name.c_str());
     return Resource(segment);
 }
 
