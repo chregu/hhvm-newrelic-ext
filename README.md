@@ -25,7 +25,7 @@ apt-get install hhvm-dev
 hphpize
 cmake .
 make
-````s
+````
 
 This will create a library file named newrelic.so which you will point to when configuring hhvm.
 
