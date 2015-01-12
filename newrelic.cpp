@@ -1,6 +1,7 @@
 #include "hphp/runtime/base/base-includes.h"
 #include "hphp/runtime/ext/std/ext_std_errorfunc.h"
 #include "hphp/runtime/base/php-globals.h"
+#include "hphp/runtime/base/hphp-system.h"
 #include "hphp/runtime/ext/ext_hotprofiler.h"
 #include "newrelic_transaction.h"
 #include "newrelic_collector_client.h"
@@ -153,19 +154,19 @@ static void HHVM_FUNCTION(newrelic_set_external_profiler, int64_t maxdepth ) {
 
 static Variant HHVM_FUNCTION(newrelic_get_scoped_generic_segment, const String & name) {
     ScopedGenericSegment * segment = nullptr;
-    segment = NEWOBJ(ScopedGenericSegment)(name.c_str());
+    segment = newres<ScopedGenericSegment>(name.c_str());
     return Resource(segment);
 }
 
 static Variant HHVM_FUNCTION(newrelic_get_scoped_database_segment, const String & table, const String & operation) {
     ScopedDatastoreSegment * segment = nullptr;
-    segment = NEWOBJ(ScopedDatastoreSegment)(table.c_str(), operation.c_str());
+    segment = newres<ScopedDatastoreSegment>(table.c_str(), operation.c_str());
     return Resource(segment);
 }
 
 static Variant HHVM_FUNCTION(newrelic_get_scoped_external_segment, const String & host, const String & name) {
     ScopedExternalSegment * segment = nullptr;
-    segment = NEWOBJ(ScopedExternalSegment)(host.c_str(), name.c_str());
+    segment = newres<ScopedExternalSegment>(host.c_str(), name.c_str());
     return Resource(segment);
 }
 
@@ -185,14 +186,20 @@ public:
     }
 
     virtual void moduleLoad(const IniSetting::Map& ini, Hdf config) {
-        if (!config.exists("EnvVariables")) return;
 
-        Hdf env_vars = config["EnvVariables"];
+        license_key = RuntimeOption::EnvVariables["NEWRELIC_LICENSE_KEY"];
+        app_name = RuntimeOption::EnvVariables["NEWRELIC_APP_NAME"];
+        app_language = RuntimeOption::EnvVariables["NEWRELIC_APP_LANGUAGE"];
+        app_language_version = RuntimeOption::EnvVariables["NEWRELIC_APP_LANGUAGE_VERSION"];
 
-        license_key = Config::GetString(ini, env_vars["NEWRELIC_LICENSE_KEY"]);
-        app_name = Config::GetString(ini, env_vars["NEWRELIC_APP_NAME"]);
-        app_language = Config::GetString(ini, env_vars["NEWRELIC_APP_LANGUAGE"]);
-        app_language_version = Config::GetString(ini, env_vars["NEWRELIC_APP_LANGUAGE_VERSION"]);
+        if (app_language.empty()) {
+            app_language = "php-hhvm";
+        }
+
+        if (app_language_version.empty()) {
+            app_language_version = HPHP::getHphpCompilerVersion();
+        }
+
 
         setenv("NEWRELIC_LICENSE_KEY", license_key.c_str(), 1);
         setenv("NEWRELIC_APP_NAME", app_name.c_str(), 1);

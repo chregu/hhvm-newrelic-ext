@@ -204,4 +204,190 @@ function newrelic_add_attribute_intern(string $name, string $value): int;
 
 <<__Native>>
 function newrelic_set_external_profiler(int $maxdepth = 7): void;
+/**
+ *    Core Overrides
+ */
+
+// sql helper/parser
+function _newrelic_parse_query($query): array {
+	if (preg_match( '/^\s*SELECT/i', $query)) {
+		if (preg_match('/\s+FROM\s+[`\'"]?([a-z\d_]+)[`\'"]?/i', $query, $match)) {
+			return ['select', $match[1]];
+		} else {
+			return ['select', 'unknown'];
+		}
+	} else if (preg_match( '/^\s*INSERT/i', $query)) {
+		if (preg_match('/\s+INTO\s+[`\'"]?([a-z\d_]+)[`\'"]?/i', $query, $match)) {
+			return ['insert', $match[1]];
+		} else {
+			return ['insert', 'unknown'];
+		}
+	} else if (preg_match( '/^\s*UPDATE/i', $query)) {
+		if (preg_match('/UPDATE\s+[`\'"]?([a-z\d_]+)[`\'"]?/i', $query, $match)) {
+			return ['update', $match[1]];
+		} else {
+			return ['update', 'unknown'];
+		}
+	} else if (preg_match( '/^\s*DELETE/i', $query)) {
+		if (preg_match('/DELETE\s+[`\'"]?([a-z\d_]+)[`\'"]?/i', $query, $match)) {
+			return ['delete', $match[1]];
+		} else {
+			return ['delete', 'unknown'];
+		}
+	} else if (preg_match( '/^\s*SHOW/i', $query)) {
+		if (preg_match('/^\s*?(SHOW\s+[a-z\d_]+)/i', $query, $match)) {
+			return ['select', $match[1]];
+		} else {
+			return ['select', 'SHOW'];
+		}
+	}
+	return ['select', 'undefined'];
+}
+
+// PDO intercepts
+function newrelic_pdo_intercept() {
+    // PDO::exec and PDO::query will be harder due to lifecycle of objects
+    //fb_intercept('PDO::exec', function ($name, $obj, $args, $data, &$done) { $done=false;});
+    //fb_intercept('PDO::query', function ($name, $obj, $args, $data, &$done) { $done=false;});
+    fb_intercept('PDOStatement::execute', function ($name, $obj, $args, $data, &$done) {
+        $query = $obj->queryString;
+        $a = _newrelic_parse_query($query);
+
+        $obj->_newrelic_segment = newrelic_get_scoped_database_segment($a[1], $a[0]);
+        $done=false;
+    });
+}
+
+// mysqli
+function newrelic_mysqli_intercept() {
+    fb_intercept('mysqli::hh_real_query', function ($name, $obj, $args, $data, &$done) {
+        if (isset($obj->_newrelic_segment) && $obj->_newrelic_segment) {
+                newrelic_segment_end($obj->_newrelic_segment);
+        }
+        $query = $args[0];
+        $a = _newrelic_parse_query($query);
+
+        $obj->_newrelic_segment = newrelic_segment_datastore_begin($a[1], $a[0]);
+        $done = false;
+    });
+
+    fb_intercept('mysqli::store_result', '_newrelic_mysqli_segment_end');
+
+    fb_intercept('mysqli::use_result', '_newrelic_mysqli_segment_end');
+}
+function _newrelic_mysqli_segment_end($name, $obj, $args, $data, &$done) {
+    if (isset($obj->_newrelic_segment) && $obj->_newrelic_segment) {
+            newrelic_segment_end($obj->_newrelic_segment);
+    }
+    $obj->_newrelic_segment = 0;
+    $done = false;
+}
+
+
+
+
+// file_get_contents (e.g. solr)
+function newrelic_file_get_contents(string $filename, bool $use_include_path = false, resource $context = null, int $offset = -1, int $maxlen = -1) {
+    $seg = newrelic_segment_external_begin($filename, 'file_get_contents');
+    $resp = @obs_file_get_contents($filename, $use_include_path, $context, $offset, $maxlen);
+    newrelic_segment_end($seg);
+    return $resp;
+}
+
+function newrelic_file_get_contents_intercept() {
+    fb_rename_function('file_get_contents', 'obs_file_get_contents');
+    fb_rename_function('newrelic_file_get_contents', 'file_get_contents');
+}
+
+
+// fread and fwrite (e.g. Redis)
+function newrelic_fread(resource $handle, int $length) {
+    if (stream_get_meta_data($handle)['wrapper_type'] != 'plainfile') {
+        $seg = newrelic_segment_external_begin('sock_read[' . stream_socket_get_name($handle,true) . ']', 'fread');
+    } else {
+        $seg = newrelic_segment_external_begin('file', 'fread');
+    }
+    $resp = @obs_fread($handle, $length);
+    newrelic_segment_end($seg);
+    return $resp;
+}
+
+function newrelic_fwrite( resource $handle, string $string, int $length = -1 ) {
+    if (stream_get_meta_data($handle)['wrapper_type'] != 'plainfile') {
+        $seg = newrelic_segment_external_begin('sock_write[' . stream_socket_get_name($handle,true) . ']', 'fwrite');
+    } else {
+        $seg = newrelic_segment_external_begin('file', 'fwrite');
+    }
+    $resp = @obs_fwrite($handle, $string, $length);
+    newrelic_segment_end($seg);
+    return $resp;
+}
+
+function newrelic_fread_fwrite_intercept() {
+    fb_rename_function('fread', 'obs_fread');
+    fb_rename_function('newrelic_fread', 'fread');
+
+    fb_rename_function('fwrite', 'obs_fwrite');
+    fb_rename_function('newrelic_fwrite', 'fwrite');
+}
+
+// curl
+function newrelic_curl_exec( resource $ch ) {
+    $url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+    $url = 'curl[' . substr($url, 0, strpos($url, '/', 8)) . ']';
+
+    $seg = newrelic_segment_external_begin($url, 'curl');
+    $resp = @obs_curl_exec($ch);
+    newrelic_segment_end($seg);
+    return $resp;
+}
+function newrelic_curl_intercept() {
+    fb_rename_function('curl_exec', 'obs_curl_exec');
+    fb_rename_function('newrelic_curl_exec', 'curl_exec');
+}
+
+// socket_read and socket_write (e.g. MongoDB (mongofill))
+function newrelic_socket_read(resource $socket, int $length, int $type = PHP_BINARY_READ) {
+    if (stream_get_meta_data($socket)['wrapper_type'] != 'plainfile') {
+        $seg = newrelic_segment_external_begin('sock_read[' . stream_socket_get_name($socket,true) . ']', 'socket_read');
+    } else {
+        $seg = newrelic_segment_external_begin('file', 'socket_read');
+    }
+    $resp = @obs_socket_read($socket, $length. $type);
+    newrelic_segment_end($seg);
+    return $resp;
+}
+
+function newrelic_socket_write( resource $socket, string $string, int $length = 0 ) {
+    if (stream_get_meta_data($socket)['wrapper_type'] != 'plainfile') {
+        $seg = newrelic_segment_external_begin('sock_write[' . stream_socket_get_name($socket,true) . ']', 'socket_write');
+    } else {
+        $seg = newrelic_segment_external_begin('file', 'socket_write');
+    }
+    $resp = @obs_socket_write($socket, $string, $length);
+    newrelic_segment_end($seg);
+    return $resp;
+}
+
+function newrelic_socket_recv( resource $socket , &$buf , int $len , int $flags ) {
+    if (stream_get_meta_data($socket)['wrapper_type'] != 'plainfile') {
+        $seg = newrelic_segment_external_begin('sock_read[' . stream_socket_get_name($socket,true) . ']', 'socket_read');
+    } else {
+        $seg = newrelic_segment_external_begin('file', 'socket_read');
+    }
+    $resp = obs_socket_recv($socket, $buf, $len, $flags);
+    newrelic_segment_end($seg);
+    return $resp;
+}
+
+function newrelic_socket_read_write_intercept() {
+    fb_rename_function('socket_read', 'obs_socket_read');
+    fb_rename_function('newrelic_socket_read', 'socket_read');
+
+    fb_rename_function('socket_write', 'obs_socket_write');
+    fb_rename_function('newrelic_socket_write', 'socket_write');
+
+    fb_rename_function('socket_recv', 'obs_socket_recv');
+    fb_rename_function('newrelic_socket_recv', 'socket_recv');
+}
 
