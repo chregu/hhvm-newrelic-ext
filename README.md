@@ -7,8 +7,8 @@ The PHP API can be found here: https://docs.newrelic.com/docs/php/php-agent-api
 See also http://blog.newrelic.com/2014/02/10/agentsdk-blog-post/ and http://blog.liip.ch/archive/2014/03/27/hhvm-and-new-relic.htm
 
 * Download the Agent SDK http://download.newrelic.com/agent_sdk/
-* Copy the library files to /usr/lib or /usr/local/lib
-* Copy the header files to /usr/include or /usr/local/include
+* Copy the library files to /usr/lib or /usr/local/lib:  `cp nr_agent_sdk*/lib/* /usr/local/lib/`
+* Copy the header files to /usr/include or /usr/local/include:  `cp nr_agent_sdk*/include/* /usr/local/include/`
 * build the extension
 
 ````
@@ -17,6 +17,15 @@ $HPHP_HOME/hphp/tools/hphpize/hphpize
 cmake .
 make
 ````
+
+If you don't have the HHVM sources installed, you can also try this, if you installed one of the hhvm binaries for ubuntu/debian
+
+````
+apt-get install hhvm-dev
+hphpize
+cmake .
+make
+````s
 
 This will create a library file named newrelic.so which you will point to when configuring hhvm.
 
@@ -46,7 +55,7 @@ git checkout -b newrelic-profiling chregu/newrelic-profiling-3.5
 ````
 
 ````
-cmake  .
+cmakes .
 make
 ````
 (this can take a while and you need all the HHVM dependencies, see other places about that)
