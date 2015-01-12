@@ -21,7 +21,7 @@ namespace HPHP {
     class NewRelicProfiler : public Profiler {
 
         public:
-        explicit NewRelicProfiler(int64_t mdepth) :  Profiler(true), max_depth(mdepth)  {
+        explicit NewRelicProfiler(int64_t mdepth) : max_depth(mdepth)  {
         }
 
 
