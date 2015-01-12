@@ -51,3 +51,31 @@ make
 ````
 (this can take a while and you need all the HHVM dependencies, see other places about that)
 
+# BETA - Automatic Database and External Services - jared@jaredkipe.com 7/11/2014
+
+For PDO / Datastore segments:
+Include this function somewhere in your application's entry script.
+````
+newrelic_pdo_intercept();
+newrelic_mysqli_intercept();
+````
+
+For External services through curl, file_get_contents, and fwrite/fread:
+
+You must explicitly enable function renaming
+*CLI: `-v Eval.JitEnableRenameFunction=true`
+*OR include in your hdf file:
+````
+Eval {
+    JitEnableRenameFunction = true
+}
+````
+
+Include these functions somewhere in your application's entry script.
+````
+newrelic_file_get_contents_intercept();
+newrelic_fread_fwrite_intercept();
+newrelic_curl_intercept();
+newrelic_socket_read_write_intercept();
+````
+
