@@ -32,7 +32,9 @@ Restart hhvm
 
 # Using Auto-Instrumentation/Profiling
 
-You have to build hhvm with HOTPROFILE support
+There seems to be a problem with HHVM 3.4/3.5 if you want to use an external profiler (maybe the problem is on my side, not sure yet)
+Until I (or hhvm) fixed this, you have to compile HHVM by yourself
+The diff is just one line (https://github.com/chregu/hhvm/compare/facebook:HHVM-3.5...newrelic-profiling-3.5).  You can do the following
 
 * Follow the Installation prerequisites for the normal plugin, copying the newrelic agent_sdk library and header files to their necesary location
 * Check out my hhvm branch with newrelic-profiling support
@@ -40,13 +42,11 @@ You have to build hhvm with HOTPROFILE support
 
 ````
 git remote add chregu https://github.com/chregu/hhvm.git
-git checkout -b newrelic-profiling chregu/newrelic-profiling
+git checkout -b newrelic-profiling chregu/newrelic-profiling-3.5
 ````
 
-* Build HHVM with HOTPROFILER Support
-
 ````
-cmake -D HOTPROFILER:BOOL=ON .
+cmake  .
 make
 ````
 (this can take a while and you need all the HHVM dependencies, see other places about that)
