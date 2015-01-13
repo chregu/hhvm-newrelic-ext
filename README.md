@@ -29,6 +29,9 @@ make
 
 This will create a library file named newrelic.so which you will point to when configuring hhvm.
 
+# Supported version
+
+This branch is known to support HHVM 3.5, see other branches for older HHVM versions
 
 # Configuring hhvm
 
