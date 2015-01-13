@@ -76,6 +76,48 @@ function newrelic_set_user_attributes($user, $account, $product) {}
 
 class NewRelicExtensionHelper {
 
+    protected static Vector<int> $stack = Vector {};
+    // there's an issue with the depth, if you enable/disable it at different depths... have to figure something out
+    protected static int $depth =  0;
+    protected static int $maxdepth = 7;
+
+    static function profile (string $mode, string $name, array $options = null): void {
+        if ($name) {
+            if ($mode == 'enter')  {
+                if (self::$depth < self::$maxdepth) {
+                    self::$stack->add(newrelic_segment_generic_begin($name));
+                } else {
+                    //self::$stack->add(0);
+                }
+                self::$depth++;
+            } else {
+                if (self::$depth < self::$maxdepth + 1) {
+                    try {
+                        $id =  self::$stack->pop();
+                        if ($id) {
+                            newrelic_segment_end($id);
+                        }
+                    } catch (Exception $e) {}
+                }
+                self::$depth--;
+            }
+        }
+    }
+
+    static function setMaxDepth(int $depth): void {
+        self::$maxdepth = $depth;
+    }
+
+    static function endAll(): void {
+        while (self::$stack->count()) {
+            $id = self::$stack->pop();
+            if ($id) {
+                 newrelic_segment_end($id);
+            }
+        }
+        self::$depth = 0;
+    }
+
     static function errorCallback($type, $message, $c) {
         $exception_type = self::friendlyErrorType($type);
         $error_message = $message;
