@@ -55,7 +55,7 @@ git checkout -b newrelic-profiling chregu/newrelic-profiling-3.5
 ````
 
 ````
-cmakes .
+cmake .
 make
 ````
 (this can take a while and you need all the HHVM dependencies, see other places about that)
