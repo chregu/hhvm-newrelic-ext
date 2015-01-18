@@ -16,6 +16,11 @@ namespace HPHP {
     s__SERVER("_SERVER"),
     s__REQUEST_URI("REQUEST_URI"),
     s__SCRIPT_NAME("SCRIPT_NAME"),
+    s__EMPTY(""),
+    s__HTTP_HOST("HTTP_HOST"),
+    s__HTTPS("HTTPS"),
+    s__PROTO_HTTP("http://"),
+    s__PROTO_HTTPS("https://"),
     s__NEWRELIC("newrelic");
 
     class NewRelicProfiler : public Profiler {
