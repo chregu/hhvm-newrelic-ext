@@ -258,7 +258,6 @@ private:
     std::string app_name;
     std::string app_language;
     std::string app_language_version;
-    int64_t global_transaction_id = 0;
     bool config_loaded;
 
 } s_newrelic_extension;
