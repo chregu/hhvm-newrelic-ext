@@ -54,7 +54,7 @@ function newrelic_ignore_transaction() {}
 function newrelic_ignore_apdex() {}
 
 function newrelic_profiling_enable(int $level) {
-    if (defined("EXTERNAL_HOTPROFILER_FIX") || version_compare(HHVM_VERSION, "3.6", ">=")) {
+    if (defined("EXTERNAL_HOTPROFILER_FIX") || version_compare(HHVM_VERSION, "3.6", ">=")) {
         newrelic_set_external_profiler($level);
         xhprof_enable(0x400);
     } else {
@@ -64,7 +64,7 @@ function newrelic_profiling_enable(int $level) {
 }
 
 function newrelic_profiling_disable() {
-    if (defined("EXTERNAL_HOTPROFILER_FIX") || version_compare(HHVM_VERSION, "3.6", ">=")) {
+    if (defined("EXTERNAL_HOTPROFILER_FIX") || version_compare(HHVM_VERSION, "3.6", ">=")) {
         xhprof_disable();
     } else {
         NewRelicExtensionHelper::endAll();
