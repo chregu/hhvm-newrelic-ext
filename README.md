@@ -23,6 +23,9 @@ If you don't have the HHVM sources installed, you can also try this, if you inst
 ````
 apt-get install hhvm-dev
 hphpize
+# fix version.h if missing in /usr/include
+# wget -O /usr/include/hphp/runtime/version.h https://raw.githubusercontent.com/facebook/hhvm/HHVM-3.5/hphp/runtime/version.h
+
 cmake .
 make
 ````
@@ -31,7 +34,7 @@ This will create a library file named newrelic.so which you will point to when c
 
 # Supported version
 
-This branch is known to support HHVM 3.5, see other branches for older HHVM versions
+This branch is known to support HHVM 3.5/3.6, see other branches for older HHVM versions
 
 # Configuring hhvm
 
@@ -47,6 +50,8 @@ Restart hhvm
 There seems to be a problem with HHVM 3.4/3.5 if you want to use an external profiler (maybe the problem is on my side, not sure yet)
 Until I (or hhvm) fixed this, you have to compile HHVM by yourself
 The diff is just one line (https://github.com/chregu/hhvm/compare/facebook:HHVM-3.5...newrelic-profiling-3.5).  You can do the following
+
+You don't need this, if you don't need function level profiling, but just "total time of script" reporting in New Relic.
 
 * Follow the Installation prerequisites for the normal plugin, copying the newrelic agent_sdk library and header files to their necesary location
 * Check out my hhvm branch with newrelic-profiling support
