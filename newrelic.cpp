@@ -247,10 +247,8 @@ public:
         f_set_exception_handler(s__NR_EXCEPTION_CALLBACK);
         //TODO: make it possible to disable that via ini
         newrelic_transaction_begin();
-        String request_url = php_global(s__SERVER).toArray()[s__REQUEST_URI].toString();
         String request_url = serverVars[s__REQUEST_URI].toString();
         newrelic_transaction_set_request_url(NEWRELIC_AUTOSCOPE, request_url.c_str());
-        String script_name = php_global(s__SERVER).toArray()[s__SCRIPT_NAME].toString();
         String script_name = serverVars[s__SCRIPT_NAME].toString();
         newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, script_name.c_str());
     }
