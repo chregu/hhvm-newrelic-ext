@@ -176,7 +176,7 @@ const StaticString
 
 static class NewRelicExtension : public Extension {
 public:
-    NewRelicExtension () : Extension("newrelic") {
+    NewRelicExtension () : Extension("newrelic", NO_EXTENSION_VERSION_YET) {
         config_loaded = false;
     }
 
