@@ -250,21 +250,24 @@ public:
         String request_url = serverVars[s__REQUEST_URI].toString();
         String https = serverVars[s__HTTPS].toString();
         String http_host = serverVars[s__HTTP_HOST].toString();
+        String script_name = serverVars[s__SCRIPT_NAME].toString();
         String full_uri;
 
-        if (https == s__EMPTY) {
-            full_uri = s__PROTO_HTTP;
+        if (request_url == s__EMPTY) {
+            full_uri = script_name;
         } else {
-            full_uri = s__PROTO_HTTPS;
+            if (https == s__EMPTY) {
+                full_uri = s__PROTO_HTTP;
+            } else {
+                full_uri = s__PROTO_HTTPS;
+            }
+            full_uri += http_host + request_url;
         }
-
-        full_uri += http_host + request_url;
 
         newrelic_transaction_set_request_url(NEWRELIC_AUTOSCOPE, full_uri.c_str());
         //set request_url strips query parameter, add a custom attribute with the full param
         newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, "FULL_URL", full_uri.c_str());
 
-        String script_name = serverVars[s__SCRIPT_NAME].toString();
         newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, script_name.c_str());
     }
 
