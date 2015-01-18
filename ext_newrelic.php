@@ -57,22 +57,27 @@ function newrelic_ignore_transaction() {}
 function newrelic_ignore_apdex() {}
 
 function newrelic_profiling_enable(int $level) {
-    if (defined("EXTERNAL_HOTPROFILER_FIX") || version_compare(HHVM_VERSION, "3.6", ">=")) {
+    if (newrelic_has_native_hotprofiler()) {
         newrelic_set_external_profiler($level);
         xhprof_enable(0x400);
     } else {
         NewRelicExtensionHelper::setMaxDepth($level);
         fb_setprofile(array("NewRelicExtensionHelper","profile"));
+        newrelic_add_custom_parameter("HotProfiler","emulated");
     }
 }
 
 function newrelic_profiling_disable() {
-    if (defined("EXTERNAL_HOTPROFILER_FIX") || version_compare(HHVM_VERSION, "3.6", ">=")) {
+    if (newrelic_has_native_hotprofiler()) {
         xhprof_disable();
     } else {
         NewRelicExtensionHelper::endAll();
         fb_setprofile(null);
     }
+}
+
+function newrelic_has_native_hotprofiler() {
+    return (defined("EXTERNAL_HOTPROFILER_FIX") || version_compare(HHVM_VERSION, "3.6", ">="));
 }
 
 //not implemented yet
