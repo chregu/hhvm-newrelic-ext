@@ -4,7 +4,7 @@ $loaded = extension_loaded("newrelic");
 print("newrelic loaded: ".$loaded."\n");
 
 print("newrelic_start_transaction exists: ".function_exists("newrelic_start_transaction")."\n");
-print("newrelic_transaction_set_name exists: ".function_exists("newrelic_transaction_set_name")."\n");
+print("newrelic_name_transaction exists: ".function_exists("newrelic_name_transaction")."\n");
 print("newrelic_transaction_set_request_url exists: ".function_exists("newrelic_transaction_set_request_url")."\n");
 print("newrelic_transaction_set_threshold exists: ".function_exists("newrelic_transaction_set_threshold")."\n");
 print("newrelic_end_transaction exists: ".function_exists("newrelic_end_transaction")."\n");
@@ -20,9 +20,6 @@ print("name_error_code: ".$name_error_code."\n");
 
 $request_url_error_code = newrelic_transaction_set_request_url("my/path");
 print("request_url_error_code: ".$name_error_code."\n");
-
-$threshold_error_code = newrelic_transaction_set_threshold(100);
-print("threshold_error_code: ".$threshold_error_code."\n");
 
 $generic_segment_id = newrelic_segment_generic_begin("my_segment");
 print("generic_segment_id: ".$generic_segment_id."\n");
