@@ -248,7 +248,22 @@ public:
         //TODO: make it possible to disable that via ini
         newrelic_transaction_begin();
         String request_url = serverVars[s__REQUEST_URI].toString();
-        newrelic_transaction_set_request_url(NEWRELIC_AUTOSCOPE, request_url.c_str());
+        String https = serverVars[s__HTTPS].toString();
+        String http_host = serverVars[s__HTTP_HOST].toString();
+        String full_uri;
+
+        if (https == s__EMPTY) {
+            full_uri = s__PROTO_HTTP;
+        } else {
+            full_uri = s__PROTO_HTTPS;
+        }
+
+        full_uri += http_host + request_url;
+
+        newrelic_transaction_set_request_url(NEWRELIC_AUTOSCOPE, full_uri.c_str());
+        //set request_url strips query parameter, add a custom attribute with the full param
+        newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, "FULL_URL", full_uri.c_str());
+
         String script_name = serverVars[s__SCRIPT_NAME].toString();
         newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, script_name.c_str());
     }
@@ -258,7 +273,6 @@ private:
     std::string app_name;
     std::string app_language;
     std::string app_language_version;
-    int64_t global_transaction_id = 0;
     bool config_loaded;
 
 } s_newrelic_extension;

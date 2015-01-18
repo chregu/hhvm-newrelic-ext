@@ -1,0 +1,17 @@
+newrelic loaded: 1
+newrelic_start_transaction exists: 1
+newrelic_name_transaction exists: 1
+newrelic_transaction_set_request_url exists: 1
+newrelic_transaction_set_threshold exists: 1
+newrelic_end_transaction exists: 1
+newrelic_segment_generic_begin exists: 1
+newrelic_segment_datastore_begin exists: 1
+newrelic_segment_end exists: 1
+transaction_id: 1002
+name_error_code: 0
+request_url_error_code: 0
+generic_segment_id: 2
+datastore_segment_id: 0
+datastore_end_error_code: -196610
+generic_end_error_code: 0
+end_error_code: -65537
