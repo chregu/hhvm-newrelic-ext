@@ -31,7 +31,7 @@ This will create a library file named newrelic.so which you will point to when c
 
 # Supported version
 
-This branch is known to support HHVM 3.4, see other branches for older/newer HHVM versions
+This branch is known to support HHVM 3.4 and theoretically also HHVM 3.3, see other branches for older/newer HHVM versions
 
 # Configuring hhvm
 
