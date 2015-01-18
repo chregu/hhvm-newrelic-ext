@@ -27,11 +27,24 @@ namespace HPHP {
 
         virtual void beginFrameEx(const char *symbol);
         virtual void endFrameEx(const TypedValue *retval, const char *given_symbol);
+
+        virtual Frame *allocateFrame() override {
+            return new NewRelicProfilerFrame();
+        }
+
+        //virtual Frame *allocateFrame() override;
         private:
 
+        class NewRelicProfilerFrame : public Frame {
+            public:
+            virtual ~NewRelicProfilerFrame() {
+            }
 
+            int             m_nr_depth;
+            uint8_t         m_nr_segement_code;
+
+        };
         int64_t max_depth;
-
     };
 
 

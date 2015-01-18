@@ -176,7 +176,7 @@ const StaticString
 
 static class NewRelicExtension : public Extension {
 public:
-    NewRelicExtension () : Extension("newrelic") {
+    NewRelicExtension () : Extension("newrelic", NO_EXTENSION_VERSION_YET) {
         config_loaded = false;
     }
 
@@ -212,7 +212,7 @@ public:
     }
 
 
-    virtual void moduleInit () {
+    void moduleInit () override {
         if (config_loaded) init_newrelic();
 
         HHVM_FE(newrelic_start_transaction_intern);
@@ -240,14 +240,16 @@ public:
         newrelic_transaction_end(NEWRELIC_AUTOSCOPE);
     }
 
-    virtual void requestInit() {
+    void requestInit() override {
+        auto serverVars = php_global(s__SERVER).toArray();
+
         f_set_error_handler(s__NR_ERROR_CALLBACK);
         f_set_exception_handler(s__NR_EXCEPTION_CALLBACK);
         //TODO: make it possible to disable that via ini
         newrelic_transaction_begin();
-        String request_url = php_global(s__SERVER).toArray()[s__REQUEST_URI].toString();
+        String request_url = serverVars[s__REQUEST_URI].toString();
         newrelic_transaction_set_request_url(NEWRELIC_AUTOSCOPE, request_url.c_str());
-        String script_name = php_global(s__SERVER).toArray()[s__SCRIPT_NAME].toString();
+        String script_name = serverVars[s__SCRIPT_NAME].toString();
         newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, script_name.c_str());
     }
 

@@ -20,15 +20,18 @@
 
 namespace HPHP {
     void NewRelicProfiler::beginFrameEx(const char *symbol) {
+
+        NewRelicProfilerFrame *frame = dynamic_cast<NewRelicProfilerFrame *>(m_stack);
+
         if (m_stack->m_parent) {
-            Frame *p = m_stack->m_parent;
-            m_stack->m_recursion = p->m_recursion + 1;
+            NewRelicProfilerFrame *p = dynamic_cast<NewRelicProfilerFrame *>(frame->m_parent);
+            frame->m_nr_depth = p->m_nr_depth + 1;
         } else {
-            m_stack->m_recursion  = 0;
+            frame->m_nr_depth  = 0;
         }
-        m_stack->m_hash_code = 0;
-        if (m_stack->m_recursion < max_depth) {
-            m_stack->m_hash_code = newrelic_segment_generic_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, m_stack->m_name);
+        frame->m_nr_segement_code = 0;
+        if (frame->m_nr_depth < max_depth) {
+            frame->m_nr_segement_code = newrelic_segment_generic_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, frame->m_name);
         }
 
     }
@@ -36,9 +39,13 @@ namespace HPHP {
     void NewRelicProfiler::endFrameEx(const TypedValue *retval,
     const char *given_symbol) {
 
-        if ( m_stack->m_hash_code != 0) {
-            newrelic_segment_end(NEWRELIC_AUTOSCOPE, m_stack->m_hash_code);
-            m_stack->m_hash_code = 0;
+        char symbol[512];
+        NewRelicProfilerFrame *frame = dynamic_cast<NewRelicProfilerFrame *>(m_stack);
+        frame->getStack(2, symbol, sizeof(symbol));
+
+        if (frame->m_nr_segement_code != 0) {
+            newrelic_segment_end(NEWRELIC_AUTOSCOPE, frame->m_nr_segement_code);
+            frame->m_nr_segement_code = 0;
         }
     }
 
