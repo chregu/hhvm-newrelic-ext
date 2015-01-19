@@ -96,3 +96,12 @@ newrelic_curl_intercept();
 newrelic_socket_read_write_intercept();
 ````
 
+# Symfony Test App
+
+In the directory symfony-test, there's a small symfony app to check the functionality.
+Put it somewhere, do `composer.phar install` and call http://localhost/fibo/20, this will calculate
+the fibonacci number at position 20 very inefficently. If everything is setup correctly, you should see
+some numbers on New Relic.
+
+
+
