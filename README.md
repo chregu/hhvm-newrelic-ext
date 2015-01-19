@@ -4,7 +4,8 @@ The PHP API can be found here: https://docs.newrelic.com/docs/php/php-agent-api
 
 # Installation
 
-See also http://blog.newrelic.com/2014/02/10/agentsdk-blog-post/ and http://blog.liip.ch/archive/2014/03/27/hhvm-and-new-relic.htm
+See also http://blog.newrelic.com/2014/02/10/agentsdk-blog-post/, http://blog.liip.ch/archive/2014/03/27/hhvm-and-new-relic.htm and
+https://blog.liip.ch/archive/2015/01/19/new-relic-extension-for-hhvm-updated-to-latest-version.html
 
 * Download the Agent SDK http://download.newrelic.com/agent_sdk/
 * Copy the library files to /usr/lib or /usr/local/lib:  `cp nr_agent_sdk*/lib/* /usr/local/lib/`
