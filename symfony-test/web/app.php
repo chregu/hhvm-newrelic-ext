@@ -15,6 +15,10 @@ $loader->unregister();
 $apcLoader->register(true);
 */
 
+newrelic_profiling_enable(10);
+// default here is 2000, you can set it higher, but new relic will show you nevertheless only 2000
+//newrelic_transaction_set_max_trace_segments(6000);
+
 require_once __DIR__.'/../app/AppKernel.php';
 //require_once __DIR__.'/../app/AppCache.php';
 
