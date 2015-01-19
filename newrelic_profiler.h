@@ -47,10 +47,10 @@ namespace HPHP {
             }
 
             int             m_nr_depth;
-            uint8_t         m_nr_segement_code;
+            int64_t         m_nr_segement_code;
 
         };
-        int64_t max_depth;
+        int max_depth;
     };
 
 
