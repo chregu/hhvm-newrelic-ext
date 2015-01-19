@@ -14,10 +14,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 class FiboController extends Controller
 {
     /**
-     * @Route("/{number}", name="fibo", defaults={"number" = 7}))
+     * @Route("/{number}/{random}", name="fibo", defaults={"number" = 7, "random" = 1}))
      * @Template()
      */
-    public function indexAction($number = 8)
+    public function indexAction($number = 8, $random = 1 )
     {
         $newrelic_enabled = "no";
         if (function_exists("newrelic_start_transaction")) {
