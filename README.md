@@ -1,43 +1,81 @@
-This extension tries to implement the New Relic PHP Plugin API with the help of the New Relic SDK.
+# (Unofficial) New Relic extension for HHVM
 
-The PHP API can be found here: https://docs.newrelic.com/docs/php/php-agent-api
+This is an unofficial New Relic extension for HHVM which tries to implement the [New Relic PHP agent API](https://docs.newrelic.com/docs/agents/php-agent/configuration/php-agent-api) as much as possible. 
 
-# Installation
+It's build on the [New Relic SDK agent](https://docs.newrelic.com/docs/agents/agent-sdk/using-agent-sdk/getting-started-agent-sdk), which doesn't support all the features needed for rebuilding the PHP agent API and has some other caveats
 
-See also http://blog.newrelic.com/2014/02/10/agentsdk-blog-post/, http://blog.liip.ch/archive/2014/03/27/hhvm-and-new-relic.htm and
-https://blog.liip.ch/archive/2015/01/19/new-relic-extension-for-hhvm-updated-to-latest-version.html
+It currently supports the following features:
 
-* Download the Agent SDK http://download.newrelic.com/agent_sdk/
-* Copy the library files to /usr/lib or /usr/local/lib:  `cp nr_agent_sdk*/lib/* /usr/local/lib/`
-* Copy the header files to /usr/include or /usr/local/include:  `cp nr_agent_sdk*/include/* /usr/local/include/`
-* build the extension
+* Reporting time of execution for each call to your HHVM
+* Naming transactions 
+* Reporting errors, exceptions and notices
+* Function level profiling (not by default, see below)
+* Reporting of SQL and remote HTTP calls (not by default, see below)
+* Add custom parameters
 
-````
-export HPHP_HOME=~/dev/hhvm-profile/ #wherever your hhvm files are
-$HPHP_HOME/hphp/tools/hphpize/hphpize
-cmake .
-make
-````
+Not supported/implemented
 
-If you don't have the HHVM sources installed, you can also try this, if you installed one of the hhvm binaries for ubuntu/debian
+* Disabling collection of timing data or disabling a transaction (not implemented yet)
+* Add custom metrics (not implemented yet)
+* All the ini options of the php agent
+* Change App Name, License Key after startup of HHVM (not supported by the SDK agent)
+* Get browser header/footer (not supported by the SDK agent)
+* Auto-instrumentation for browser performance (not supported by the SDK agent)
 
-````
-apt-get install hhvm-dev
+
+For more info, see also the following blog posts:
+
+* http://blog.newrelic.com/2014/02/10/agentsdk-blog-post/
+* http://blog.liip.ch/archive/2014/03/27/hhvm-and-new-relic.html
+* http://blog.liip.ch/archive/2015/01/19/new-relic-extension-for-hhvm-updated-to-latest-version.html
+
+
+
+## Installation
+
+This extension is known to work with HHVM 3.5 and master (upcoming 3.6). For older HHVM versions, see the other branches.
+
+If you don't need function level profiling data or are using HHVM master/nightly/3.6, you can use the HHVM packages provided by Facebook. If you want to use function level profiling on HHVM 3.5, see below. 
+
+### First install the New Relic SDK files
+
+
+Check on https://download.newrelic.com/agent_sdk/ for the latest version, currently the following works:
+
+```
+mkdir newrelic
+cd newrelic
+wget https://download.newrelic.com/agent_sdk/nr_agent_sdk-v0.16.1.0-beta.x86_64.tar.gz
+tar -xzf nr_agent_sdk-*.tar.gz
+cp nr_agent_sdk-*/include/* /usr/local/include/ &&  cp nr_agent_sdk-*/lib/* /usr/local/lib/ && rm -rf /tmp/nr_agent_sdk-*
+```
+
+### Install hhvm-dev
+
+See https://github.com/facebook/hhvm/wiki/Prebuilt-Packages-for-HHVM about how to install HHVM in general on different operating systems
+
+For compiling the extension, you need the dev package as well, eg. on Ubuntu/Debian with
+
+```
+sudo apt-get install hhvm-dev
+```
+
+### Compile the extension
+
+```
+git clone git@github.com:chregu/hhvm-newrelic-ext.git
+cd hhvm-newrelic-ext
+# the following is needed if you use HHVM 3.5, since one header file is missing
+wget -O /usr/include/hphp/runtime/version.h https://raw.githubusercontent.com/facebook/hhvm/HHVM-3.5/hphp/runtime/version.h
+
 hphpize
-# fix version.h if missing in /usr/include
-# wget -O /usr/include/hphp/runtime/version.h https://raw.githubusercontent.com/facebook/hhvm/HHVM-3.5/hphp/runtime/version.h
-
 cmake .
 make
-````
+make install
+```
 
-This will create a library file named newrelic.so which you will point to when configuring hhvm.
 
-# Supported version
-
-This branch is known to support HHVM 3.5/3.6, see other branches for older HHVM versions
-
-# Configuring hhvm
+## Configuring hhvm
 
 The Agent SDK example ships with a sample hhvm config file called hhvm.hdf. You’ll need to make the following changes to your config file.
 
@@ -46,7 +84,7 @@ Set the newrelic path under the DynamicExtensions section to the library that yo
 
 Restart hhvm
 
-# Using Auto-Instrumentation/Profiling
+## Using Function Level Profiling
 
 There seems to be a problem with HHVM 3.4/3.5 if you want to use an external profiler (maybe the problem is on my side, not sure yet)
 Until I (or hhvm) fixed this, you have to compile HHVM by yourself
@@ -69,7 +107,7 @@ make
 ````
 (this can take a while and you need all the HHVM dependencies, see other places about that)
 
-# BETA - Automatic Database and External Services - jared@jaredkipe.com 7/11/2014
+## BETA - Automatic Database and External Services - jared@jaredkipe.com 7/11/2014
 
 For PDO / Datastore segments:
 Include this function somewhere in your application's entry script.
@@ -97,7 +135,7 @@ newrelic_curl_intercept();
 newrelic_socket_read_write_intercept();
 ````
 
-# Symfony Test App
+## Symfony Test App
 
 In the directory symfony-test, there's a small symfony app to check the functionality.
 Put it somewhere, do `composer.phar install` and call http://localhost/fibo/20, this will calculate
