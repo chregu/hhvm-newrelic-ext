@@ -33,7 +33,7 @@ For more info, see also the following blog posts:
 
 ## Installation
 
-This extension is known to work with HHVM 3.5 and master (upcoming 3.6). For older HHVM versions, see the other branches.
+This extension is known to work with HHVM 3.3 and later (upcoming 3.6). For older HHVM versions, see the other branches.
 
 If you don't need function level profiling data or are using HHVM master/nightly/3.6, you can use the HHVM packages provided by Facebook. If you want to use function level profiling on HHVM 3.5, [see below](#using-function-level-profiling-in-hhvm-35).
 
@@ -95,7 +95,7 @@ When you use the PHP agent of New Relic, you're certainly used to have function 
 * You have to explicitely enable it
 * It slows down your request by factor 2 or more
 * It can only show up to 2'000 function calls
-* If you use an unpatched HHVM 3.5 (fixed in HHVM 3.6), it's even slower
+* If you use an unpatched HHVM 3.5 or less (fixed in HHVM 3.6), it's even slower
 
 ### Enabling Function Level Profiling
 
@@ -111,7 +111,7 @@ You can start it at any point in your application. If you only want to profile o
 
 ### Using Function Level Profiling in HHVM 3.5
 
-As mentioned above, an unpatched HHVM 3.5 makes your profiling event slower, since there's something wrong with using an external hotprofiler and we have to fall back to "user level profiling". It works, but it's slow.
+As mentioned above, an unpatched HHVM 3.5 (or less) makes your profiling event slower, since there's something wrong with using an external hotprofiler and we have to fall back to "user level profiling". It works, but it's slow.
 
 You have two option to get it faster: Either install hhvm-nightly (or the stable one once HHVM 3.6 is out). Or compile HHVM 3.5 by yourself with this patch: https://github.com/chregu/hhvm/compare/facebook:HHVM-3.5...newrelic-profiling-3.5.diff, or do
 

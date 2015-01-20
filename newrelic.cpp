@@ -159,19 +159,34 @@ static void HHVM_FUNCTION(newrelic_set_external_profiler, int64_t maxdepth ) {
 
 static Variant HHVM_FUNCTION(newrelic_get_scoped_generic_segment, const String & name) {
     ScopedGenericSegment * segment = nullptr;
-    segment = newres<ScopedGenericSegment>(name.c_str());
+    // NEWOBJ existsonly until HHVM 3.4
+    #ifdef NEWOBJ
+        segment = NEWOBJ(ScopedGenericSegment)(name.c_str());
+    #else
+        segment = newres<ScopedGenericSegment>(name.c_str());
+    #endif
     return Resource(segment);
 }
 
 static Variant HHVM_FUNCTION(newrelic_get_scoped_database_segment, const String & table, const String & operation) {
     ScopedDatastoreSegment * segment = nullptr;
-    segment = newres<ScopedDatastoreSegment>(table.c_str(), operation.c_str());
+    // NEWOBJ existsonly until HHVM 3.4
+    #ifdef NEWOBJ
+        segment = NEWOBJ(ScopedDatastoreSegment)(table.c_str(), operation.c_str());
+    #else
+        segment = newres<ScopedDatastoreSegment>(table.c_str(), operation.c_str());
+    #endif
     return Resource(segment);
 }
 
 static Variant HHVM_FUNCTION(newrelic_get_scoped_external_segment, const String & host, const String & name) {
     ScopedExternalSegment * segment = nullptr;
-    segment = newres<ScopedExternalSegment>(host.c_str(), name.c_str());
+    // NEWOBJ existsonly until HHVM 3.4
+    #ifdef NEWOBJ
+        segment = NEWOBJ(ScopedExternalSegment)(host.c_str(), name.c_str());
+    #else
+        segment = newres<ScopedExternalSegment>(host.c_str(), name.c_str());
+    #endif
     return Resource(segment);
 }
 

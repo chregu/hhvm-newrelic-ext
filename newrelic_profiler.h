@@ -27,9 +27,12 @@ namespace HPHP {
     class NewRelicProfiler : public Profiler {
 
         public:
-        explicit NewRelicProfiler(int64_t mdepth) :  Profiler(true), max_depth(mdepth)  {
-        }
-
+        // NEWOBJ existsonly until HHVM 3.4
+        #ifdef NEWOBJ
+            explicit NewRelicProfiler(int64_t mdepth) : max_depth(mdepth)  {}
+        #else
+            explicit NewRelicProfiler(int64_t mdepth) : Profiler(true), max_depth(mdepth)  {}
+        #endif
 
         virtual void beginFrameEx(const char *symbol);
         virtual void endFrameEx(const TypedValue *retval, const char *given_symbol);
