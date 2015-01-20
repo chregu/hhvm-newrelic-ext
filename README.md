@@ -9,8 +9,8 @@ It currently supports the following features:
 * Reporting time of execution for each call to your HHVM
 * Naming transactions
 * Reporting errors, exceptions and notices
-* Function level profiling (not by default, see below)
-* Reporting of SQL and remote HTTP calls (not by default, see below)
+* Function level profiling (not by default, [see below](#using-function-level-profiling))
+* Reporting of SQL and remote HTTP calls (not by default, [see below](#automatic-database-and-external-services-profiling))
 * Add custom parameters
 
 Not supported/implemented
@@ -35,7 +35,7 @@ For more info, see also the following blog posts:
 
 This extension is known to work with HHVM 3.5 and master (upcoming 3.6). For older HHVM versions, see the other branches.
 
-If you don't need function level profiling data or are using HHVM master/nightly/3.6, you can use the HHVM packages provided by Facebook. If you want to use function level profiling on HHVM 3.5, see below.
+If you don't need function level profiling data or are using HHVM master/nightly/3.6, you can use the HHVM packages provided by Facebook. If you want to use function level profiling on HHVM 3.5, [see below](#using-function-level-profiling-in-hhvm-35).
 
 ### Install the New Relic SDK files
 
