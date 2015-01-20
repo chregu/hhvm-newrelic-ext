@@ -7,6 +7,7 @@
 #include "newrelic_collector_client.h"
 #include "newrelic_common.h"
 #include "newrelic_profiler.h"
+#include "hphp/runtime/server/transport.h"
 
 #include <string>
 #include <iostream>
@@ -276,6 +277,17 @@ public:
         }
 
         newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, script_name.c_str());
+
+        Transport *transport = g_context->getTransport();
+        if (transport) {
+            HeaderMap headers;
+            transport->getHeaders(headers);
+            Array h = get_headers(headers);
+            if (h.exists(s__USER_AGENT)) {
+                newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, "request.headers.User-Agent", h[s__USER_AGENT].toString().c_str());
+            }
+        }
+
     }
 
 private:
@@ -284,6 +296,18 @@ private:
     std::string app_language;
     std::string app_language_version;
     bool config_loaded;
+
+    static Array get_headers(HeaderMap& headers) {
+        Array ret;
+        for (auto& iter : headers) {
+            const auto& values = iter.second;
+            if (!values.size()) {
+                continue;
+            }
+            ret.set(String(iter.first), String(values.back()));
+        }
+        return ret;
+    }
 
 } s_newrelic_extension;
 
