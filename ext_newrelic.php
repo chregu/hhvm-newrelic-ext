@@ -3,9 +3,6 @@
 //not implemented yet
 function newrelic_set_appname(string $name, string $key, bool $xmit): mixed {}
 
-//not implemented yet
-function newrelic_custom_metric(string $name, float $value) {}
-
 //The same as newrelic_add_attribute, but like in the officical NewRelic PHP API
 function newrelic_add_custom_parameter(string $name, string $value) {
     newrelic_add_attribute_intern($name, $value);
@@ -33,21 +30,11 @@ function newrelic_notice_error(?string $error_message, \Exception $e = null)  {
 function newrelic_background_job(bool $true) {}
 
 function newrelic_start_transaction(string $appname = null, string $license = null): int {
-    $id = newrelic_start_transaction_intern();
-    if(isset($_SERVER["REQUEST_URI"])) {
-        $url = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-        newrelic_transaction_set_request_url($url);
-    }
-    return $id;
+    return newrelic_start_transaction_intern();
 }
 
 function newrelic_name_transaction(string $name): int {
-    $id = newrelic_name_transaction_intern($name);
-    if(isset($_SERVER["REQUEST_URI"])) {
-        $url = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-        newrelic_transaction_set_request_url($url);
-    }
-    return $id;
+    return newrelic_name_transaction_intern($name);
 }
 
 //not implemented yet
@@ -57,22 +44,27 @@ function newrelic_ignore_transaction() {}
 function newrelic_ignore_apdex() {}
 
 function newrelic_profiling_enable(int $level) {
-    if (defined("EXTERNAL_HOTPROFILER_FIX") || version_compare(HHVM_VERSION, "3.6", ">=")) {
+    if (newrelic_has_native_hotprofiler()) {
         newrelic_set_external_profiler($level);
         xhprof_enable(0x400);
     } else {
         NewRelicExtensionHelper::setMaxDepth($level);
         fb_setprofile(array("NewRelicExtensionHelper","profile"));
+        newrelic_add_custom_parameter("HotProfiler","emulated");
     }
 }
 
 function newrelic_profiling_disable() {
-    if (defined("EXTERNAL_HOTPROFILER_FIX") || version_compare(HHVM_VERSION, "3.6", ">=")) {
+    if (newrelic_has_native_hotprofiler()) {
         xhprof_disable();
     } else {
         NewRelicExtensionHelper::endAll();
         fb_setprofile(null);
     }
+}
+
+function newrelic_has_native_hotprofiler() {
+    return (defined("EXTERNAL_HOTPROFILER_FIX") || version_compare(HHVM_VERSION, "3.6", ">="));
 }
 
 //not implemented yet
@@ -259,6 +251,10 @@ function newrelic_add_attribute_intern(string $name, string $value): int;
 
 <<__Native>>
 function newrelic_set_external_profiler(int $maxdepth = 7): void;
+
+<<__Native>>
+function newrelic_custom_metric(string $name, float $value): int;
+
 /**
  *    Core Overrides
  */

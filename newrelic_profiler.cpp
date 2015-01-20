@@ -43,7 +43,7 @@ namespace HPHP {
         NewRelicProfilerFrame *frame = dynamic_cast<NewRelicProfilerFrame *>(m_stack);
         frame->getStack(2, symbol, sizeof(symbol));
 
-        if (frame->m_nr_segement_code != 0) {
+        if (frame->m_nr_segement_code > 0) {
             newrelic_segment_end(NEWRELIC_AUTOSCOPE, frame->m_nr_segement_code);
             frame->m_nr_segement_code = 0;
         }

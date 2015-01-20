@@ -16,11 +16,13 @@ namespace HPHP {
     s__SERVER("_SERVER"),
     s__REQUEST_URI("REQUEST_URI"),
     s__SCRIPT_NAME("SCRIPT_NAME"),
+    s__QUERY_STRING("QUERY_STRING"),
     s__EMPTY(""),
     s__HTTP_HOST("HTTP_HOST"),
     s__HTTPS("HTTPS"),
     s__PROTO_HTTP("http://"),
     s__PROTO_HTTPS("https://"),
+    s__USER_AGENT("User-Agent"),
     s__NEWRELIC("newrelic");
 
     class NewRelicProfiler : public Profiler {
@@ -46,10 +48,10 @@ namespace HPHP {
             }
 
             int             m_nr_depth;
-            uint8_t         m_nr_segement_code;
+            int64_t         m_nr_segement_code;
 
         };
-        int64_t max_depth;
+        int max_depth;
     };
 
 

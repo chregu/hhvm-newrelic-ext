@@ -1,0 +1,12 @@
+{% extends "AcmeDemoBundle::layout.html.twig" %}
+
+{% block title "Fibonacci " ~ number %}
+
+{% block content %}
+    <h1>Fibonacci of {{ number }} is {{ result }}!</h1>
+    <p>Info:</p>
+    <p>New Relic enabled?: {{ newrelic }}</p>
+    <p>PHP version?: {{ version }}</p>
+{% endblock %}
+
+

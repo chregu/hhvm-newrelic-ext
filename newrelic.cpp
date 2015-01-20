@@ -7,6 +7,7 @@
 #include "newrelic_collector_client.h"
 #include "newrelic_common.h"
 #include "newrelic_profiler.h"
+#include "hphp/runtime/server/transport.h"
 
 #include <string>
 #include <iostream>
@@ -147,6 +148,10 @@ static int64_t HHVM_FUNCTION(newrelic_add_attribute_intern, const String & name,
     return newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, name.c_str(), value.c_str());
 }
 
+static int64_t HHVM_FUNCTION(newrelic_custom_metric, const String & name, double value) {
+    return newrelic_record_metric(name.c_str(), value);
+}
+
 static void HHVM_FUNCTION(newrelic_set_external_profiler, int64_t maxdepth ) {
     Profiler *pr = new NewRelicProfiler(maxdepth);
     s_profiler_factory->setExternalProfiler(pr);
@@ -250,22 +255,39 @@ public:
         String request_url = serverVars[s__REQUEST_URI].toString();
         String https = serverVars[s__HTTPS].toString();
         String http_host = serverVars[s__HTTP_HOST].toString();
+        String script_name = serverVars[s__SCRIPT_NAME].toString();
+        String query_string = serverVars[s__QUERY_STRING].toString();
         String full_uri;
 
-        if (https == s__EMPTY) {
-            full_uri = s__PROTO_HTTP;
+        if (request_url == s__EMPTY) {
+            full_uri = script_name;
         } else {
-            full_uri = s__PROTO_HTTPS;
+            if (https == s__EMPTY) {
+                full_uri = s__PROTO_HTTP;
+            } else {
+                full_uri = s__PROTO_HTTPS;
+            }
+            full_uri += http_host + request_url;
         }
-
-        full_uri += http_host + request_url;
 
         newrelic_transaction_set_request_url(NEWRELIC_AUTOSCOPE, full_uri.c_str());
         //set request_url strips query parameter, add a custom attribute with the full param
-        newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, "FULL_URL", full_uri.c_str());
+        if (query_string != s__EMPTY) {
+            newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, "FULL_URL", full_uri.c_str());
+        }
 
-        String script_name = serverVars[s__SCRIPT_NAME].toString();
         newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, script_name.c_str());
+
+        Transport *transport = g_context->getTransport();
+        if (transport) {
+            HeaderMap headers;
+            transport->getHeaders(headers);
+            Array h = get_headers(headers);
+            if (h.exists(s__USER_AGENT)) {
+                newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, "request.headers.User-Agent", h[s__USER_AGENT].toString().c_str());
+            }
+        }
+
     }
 
 private:
@@ -274,6 +296,18 @@ private:
     std::string app_language;
     std::string app_language_version;
     bool config_loaded;
+
+    static Array get_headers(HeaderMap& headers) {
+        Array ret;
+        for (auto& iter : headers) {
+            const auto& values = iter.second;
+            if (!values.size()) {
+                continue;
+            }
+            ret.set(String(iter.first), String(values.back()));
+        }
+        return ret;
+    }
 
 } s_newrelic_extension;
 
