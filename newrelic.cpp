@@ -278,13 +278,25 @@ public:
 
         newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, script_name.c_str());
 
+        // add http request headers to transaction attributes
         Transport *transport = g_context->getTransport();
         if (transport) {
             HeaderMap headers;
             transport->getHeaders(headers);
-            Array h = get_headers(headers);
-            if (h.exists(s__USER_AGENT)) {
-                newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, "request.headers.User-Agent", h[s__USER_AGENT].toString().c_str());
+            for (auto& iter : headers) {
+                const auto& values = iter.second;
+                if (!values.size()) {
+                    continue;
+                }
+                if (iter.first == "User-Agent") {
+                    newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, "request.headers.User-Agent", values.back().c_str());
+                } else if (iter.first == "Accept") {
+                    newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, "request.headers.Accept", values.back().c_str());
+                } else if (iter.first == "Accept-Language") {
+                    newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, "request.headers.Accept-Language", values.back().c_str());
+                } else if (iter.first == "Api-Version") {
+                    newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, "request.headers.Api-Version", values.back().c_str());
+                }
             }
         }
 
@@ -296,19 +308,6 @@ private:
     std::string app_language;
     std::string app_language_version;
     bool config_loaded;
-
-    static Array get_headers(HeaderMap& headers) {
-        Array ret;
-        for (auto& iter : headers) {
-            const auto& values = iter.second;
-            if (!values.size()) {
-                continue;
-            }
-            ret.set(String(iter.first), String(values.back()));
-        }
-        return ret;
-    }
-
 } s_newrelic_extension;
 
 HHVM_GET_MODULE(newrelic)

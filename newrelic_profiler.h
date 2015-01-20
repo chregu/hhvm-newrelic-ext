@@ -22,7 +22,6 @@ namespace HPHP {
     s__HTTPS("HTTPS"),
     s__PROTO_HTTP("http://"),
     s__PROTO_HTTPS("https://"),
-    s__USER_AGENT("User-Agent"),
     s__NEWRELIC("newrelic");
 
     class NewRelicProfiler : public Profiler {
