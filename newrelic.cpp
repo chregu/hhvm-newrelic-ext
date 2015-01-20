@@ -147,6 +147,10 @@ static int64_t HHVM_FUNCTION(newrelic_add_attribute_intern, const String & name,
     return newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, name.c_str(), value.c_str());
 }
 
+static int64_t HHVM_FUNCTION(newrelic_custom_metric, const String & name, double value) {
+    return newrelic_record_metric(name.c_str(), value);
+}
+
 static void HHVM_FUNCTION(newrelic_set_external_profiler, int64_t maxdepth ) {
     Profiler *pr = new NewRelicProfiler(maxdepth);
     s_profiler_factory->setExternalProfiler(pr);

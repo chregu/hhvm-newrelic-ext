@@ -12,11 +12,11 @@ It currently supports the following features:
 * Function level profiling (not by default, [see below](#using-function-level-profiling))
 * Reporting of SQL and remote HTTP calls (not by default, [see below](#automatic-database-and-external-services-profiling))
 * Add custom parameters
+* Add custom metrics
 
 Not supported/implemented
 
 * Disabling collection of timing data or disabling a transaction (not implemented yet)
-* Add custom metrics (not implemented yet)
 * All the ini options of the php agent
 * Change App Name, License Key after startup of HHVM (not supported by the SDK agent)
 * Get browser header/footer (not supported by the SDK agent)
@@ -47,8 +47,8 @@ mkdir newrelic
 cd newrelic
 wget https://download.newrelic.com/agent_sdk/nr_agent_sdk-v0.16.1.0-beta.x86_64.tar.gz
 tar -xzf nr_agent_sdk-*.tar.gz
-cp nr_agent_sdk-*/include/* /usr/local/include/ 
-cp nr_agent_sdk-*/lib/* /usr/local/lib/ 
+cp nr_agent_sdk-*/include/* /usr/local/include/
+cp nr_agent_sdk-*/lib/* /usr/local/lib/
 ```
 
 ### Install hhvm-dev
@@ -93,7 +93,7 @@ Now restart hhvm and you should be all set and profiling data should show up in 
 When you use the PHP agent of New Relic, you're certainly used to have function level profiling, meaning you see which function took how much time. This is also possible with this extension, but with the following caveats:
 
 * You have to explicitely enable it
-* It slows down your request by factor 2 or more 
+* It slows down your request by factor 2 or more
 * It can only show up to 2'000 function calls
 * If you use an unpatched HHVM 3.5 (fixed in HHVM 3.6), it's even slower
 
@@ -111,7 +111,7 @@ You can start it at any point in your application. If you only want to profile o
 
 ### Using Function Level Profiling in HHVM 3.5
 
-As mentioned above, an unpatched HHVM 3.5 makes your profiling event slower, since there's something wrong with using an external hotprofiler and we have to fall back to "user level profiling". It works, but it's slow. 
+As mentioned above, an unpatched HHVM 3.5 makes your profiling event slower, since there's something wrong with using an external hotprofiler and we have to fall back to "user level profiling". It works, but it's slow.
 
 You have two option to get it faster: Either install hhvm-nightly (or the stable one once HHVM 3.6 is out). Or compile HHVM 3.5 by yourself with this patch: https://github.com/chregu/hhvm/compare/facebook:HHVM-3.5...newrelic-profiling-3.5.diff, or do
 
@@ -128,7 +128,7 @@ make
 
 It has to do a lot more, of course. But this extension is not slower than the built-in HHVM hotprofilers like xhprof. So not much we can do about it. Let's hope New Relic finds a way to make it faster with their hopefully coming HHVM agent.
 
-Advice: 
+Advice:
 
 * Don't use Function Level Profiling if you don't absolutely need it (or just randomly every 100th request or so)
 * Or only use it in small parts of your code

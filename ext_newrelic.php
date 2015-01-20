@@ -3,9 +3,6 @@
 //not implemented yet
 function newrelic_set_appname(string $name, string $key, bool $xmit): mixed {}
 
-//not implemented yet
-function newrelic_custom_metric(string $name, float $value) {}
-
 //The same as newrelic_add_attribute, but like in the officical NewRelic PHP API
 function newrelic_add_custom_parameter(string $name, string $value) {
     newrelic_add_attribute_intern($name, $value);
@@ -254,6 +251,10 @@ function newrelic_add_attribute_intern(string $name, string $value): int;
 
 <<__Native>>
 function newrelic_set_external_profiler(int $maxdepth = 7): void;
+
+<<__Native>>
+function newrelic_custom_metric(string $name, float $value): int;
+
 /**
  *    Core Overrides
  */
