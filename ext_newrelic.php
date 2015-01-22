@@ -223,7 +223,7 @@ function newrelic_end_transaction(): int;
 function newrelic_segment_generic_begin(string $name): int;
 
 <<__Native>>
-function newrelic_segment_datastore_begin(string $table, string $operation): int;
+function newrelic_segment_datastore_begin(string $table, string $operation, string $sql = "", string $sql_trace_rollup_name = ""): int;
 
 <<__Native>>
 function newrelic_segment_external_begin(string $host, string $name): int;
@@ -235,7 +235,7 @@ function newrelic_segment_end(int $id): int;
 function newrelic_get_scoped_generic_segment(string $name): mixed;
 
 <<__Native>>
-function newrelic_get_scoped_database_segment(string $table, string $operation): mixed;
+function newrelic_get_scoped_database_segment(string $table, string $operation, string $sql = "", string $sql_trace_rollup_name = ""): mixed;
 
 <<__Native>>
 function newrelic_get_scoped_external_segment(string $host, string $name): mixed;
@@ -304,7 +304,7 @@ function newrelic_pdo_intercept() {
         $query = $obj->queryString;
         $a = _newrelic_parse_query($query);
 
-        $obj->_newrelic_segment = newrelic_get_scoped_database_segment($a[1], $a[0]);
+        $obj->_newrelic_segment = newrelic_get_scoped_database_segment($a[1], $a[0], $query);
         $done=false;
     });
 }
@@ -318,7 +318,7 @@ function newrelic_mysqli_intercept() {
         $query = $args[0];
         $a = _newrelic_parse_query($query);
 
-        $obj->_newrelic_segment = newrelic_segment_datastore_begin($a[1], $a[0]);
+        $obj->_newrelic_segment = newrelic_segment_datastore_begin($a[1], $a[0], $query);
         $done = false;
     });
 

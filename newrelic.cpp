@@ -52,8 +52,13 @@ public:
 
     virtual const String& o_getClassNameHook() const { return classnameof(); }
 
-    explicit ScopedDatastoreSegment(string table, string operation) : table(table), operation(operation) {
-// TODO        segment_id = newrelic_segment_datastore_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, table.c_str(), operation.c_str());
+    explicit ScopedDatastoreSegment(string table, string operation, string sql, string sql_trace_rollup_name) : table(table), operation(operation), sql(sql), sql_trace_rollup_name(sql_trace_rollup_name) {
+        //TODO sql_trace_rollup_name
+        if (sql_trace_rollup_name == "") {
+            segment_id = newrelic_segment_datastore_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, table.c_str(), operation.c_str(), sql.c_str(), NULL, NULL);
+        } else {
+            segment_id = newrelic_segment_datastore_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, table.c_str(), operation.c_str(), sql.c_str(), sql_trace_rollup_name.c_str(), NULL);
+        }
     }
 
     virtual ~ScopedDatastoreSegment() {
@@ -65,6 +70,8 @@ private:
     int64_t segment_id;
     string table;
     string operation;
+    string sql;
+    string sql_trace_rollup_name;
 };
 
 void ScopedDatastoreSegment::sweep() { }
@@ -128,8 +135,7 @@ static int64_t HHVM_FUNCTION(newrelic_segment_generic_begin, const String & name
 }
 
 static int64_t HHVM_FUNCTION(newrelic_segment_datastore_begin, const String & table, const String & operation, const String & sql, const String & sql_trace_rollup_name, String & sql_obfuscator) {
-// TODO    return newrelic_segment_datastore_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, table.c_str(), operation.c_str(), sql.c_str(), sql_trace_rollup_name.c_str(), sql_obfuscator.c_str());
-    return false;
+    return newrelic_segment_datastore_begin(NEWRELIC_AUTOSCOPE, NEWRELIC_AUTOSCOPE, table.c_str(), operation.c_str(), sql.c_str(), sql_trace_rollup_name.c_str(), NULL);
 }
 
 static int64_t HHVM_FUNCTION(newrelic_segment_external_begin, const String & host, const String & name) {
@@ -168,13 +174,13 @@ static Variant HHVM_FUNCTION(newrelic_get_scoped_generic_segment, const String &
     return Resource(segment);
 }
 
-static Variant HHVM_FUNCTION(newrelic_get_scoped_database_segment, const String & table, const String & operation) {
+static Variant HHVM_FUNCTION(newrelic_get_scoped_database_segment, const String & table, const String & operation, const String sql, const String sql_trace_rollup_name) {
     ScopedDatastoreSegment * segment = nullptr;
     // NEWOBJ existsonly until HHVM 3.4
     #ifdef NEWOBJ
-        segment = NEWOBJ(ScopedDatastoreSegment)(table.c_str(), operation.c_str());
+        segment = NEWOBJ(ScopedDatastoreSegment)(table.c_str(), operation.c_str(), sql.c_str(), sql_trace_rollup_name.c_str());
     #else
-        segment = newres<ScopedDatastoreSegment>(table.c_str(), operation.c_str());
+        segment = newres<ScopedDatastoreSegment>(table.c_str(), operation.c_str(), sql.c_str(), sql_trace_rollup_name.c_str());
     #endif
     return Resource(segment);
 }
