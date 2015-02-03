@@ -278,6 +278,7 @@ public:
         String http_host = serverVars[s__HTTP_HOST].toString();
         String script_name = serverVars[s__SCRIPT_NAME].toString();
         String query_string = serverVars[s__QUERY_STRING].toString();
+        String transaction_name = request_url == s__EMPTY ? script_name : request_url;
         String full_uri;
 
         if (request_url == s__EMPTY) {
@@ -297,7 +298,7 @@ public:
             newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, "FULL_URL", full_uri.c_str());
         }
 
-        newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, script_name.c_str());
+        newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, transaction_name.c_str());
 
         // add http request headers to transaction attributes
         Transport *transport = g_context->getTransport();
