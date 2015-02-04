@@ -297,7 +297,14 @@ public:
             newrelic_transaction_add_attribute(NEWRELIC_AUTOSCOPE, "FULL_URL", full_uri.c_str());
         }
 
-        newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, script_name.c_str());
+        //build transaction name
+        String transaction_name = request_url == s__EMPTY ? script_name : request_url;
+        size_t get_param_loc = transaction_name.find('?');
+        if(get_param_loc != string::npos) {
+            transaction_name = transaction_name.substr(0, get_param_loc);
+        }
+
+        newrelic_transaction_set_name(NEWRELIC_AUTOSCOPE, transaction_name.c_str());
 
         // add http request headers to transaction attributes
         Transport *transport = g_context->getTransport();
