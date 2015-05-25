@@ -33,9 +33,9 @@ For more info, see also the following blog posts:
 
 ## Installation
 
-This extension is known to work with HHVM 3.3 and later (upcoming 3.6). For older HHVM versions, see the other branches.
+This extension is known to work with HHVM 3.7. For older HHVM versions, see the other branches.
 
-If you don't need function level profiling data or are using HHVM master/nightly/3.6, you can use the HHVM packages provided by Facebook. If you want to use function level profiling on HHVM 3.5, [see below](#using-function-level-profiling-in-hhvm-35).
+If you don't need function level profiling data or are using HHVM 3.7, you can use the HHVM packages provided by Facebook. If you want to use function level profiling on HHVM 3.5, [see below](#using-function-level-profiling-in-hhvm-35).
 
 ### Install the New Relic SDK files
 
@@ -113,7 +113,7 @@ You can start it at any point in your application. If you only want to profile o
 
 As mentioned above, an unpatched HHVM 3.5 (or less) makes your profiling event slower, since there's something wrong with using an external hotprofiler and we have to fall back to "user level profiling". It works, but it's slow.
 
-You have two option to get it faster: Either install hhvm-nightly (or the stable one once HHVM 3.6 is out). Or compile HHVM 3.5 by yourself with this patch: https://github.com/chregu/hhvm/compare/facebook:HHVM-3.5...newrelic-profiling-3.5.diff, or do
+You have two option to get it faster: Either install at least hhvm 3.6. Or compile HHVM 3.5 by yourself with this patch: https://github.com/chregu/hhvm/compare/facebook:HHVM-3.5...newrelic-profiling-3.5.diff, or do
 
 ````
 git checkout https://github.com/chregu/hhvm.git
