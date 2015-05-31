@@ -67,8 +67,8 @@ sudo apt-get install hhvm-dev
 git clone git@github.com:chregu/hhvm-newrelic-ext.git
 cd hhvm-newrelic-ext
 
-# the following is needed if you use HHVM 3.5, since one header file is missing
-wget -O /usr/include/hphp/runtime/version.h https://raw.githubusercontent.com/facebook/hhvm/HHVM-3.5/hphp/runtime/version.h
+# the following is needed if you use HHVM 3.7, since one header file is missing
+wget -O /usr/include/hphp/runtime/version.h https://raw.githubusercontent.com/facebook/hhvm/HHVM-3.7/hphp/runtime/version.h
 
 hphpize
 cmake .
