@@ -76,6 +76,13 @@ make
 make install
 ```
 
+### Configuring extention
+
+```
+cd /usr/lib/x86_64-linux-gnu/hhvm/extensions/
+sudo ln -s 20150212/newrelic.so
+```
+
 ### Configuring hhvm
 
 Add the lines from [php.ini](https://github.com/chregu/hhvm-newrelic-ext/blob/master/php.ini) to your php.ini and replace NEWRELIC_LICENSE_KEY and NEWRELIC_APP_NAME with your values. The minimum lines are (see the example file for more):
