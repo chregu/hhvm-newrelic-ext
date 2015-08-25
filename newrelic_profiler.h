@@ -2,7 +2,7 @@
 #define incl_HPHP_NEWRELIC_PROFILER_H_
 
 
-#include "hphp/runtime/ext/ext_hotprofiler.h"
+#include "hphp/runtime/ext/hotprofiler/ext_hotprofiler.h"
 #include "hphp/runtime/base/php-globals.h"
 #include "hphp/runtime/server/server-stats.h"
 #include "newrelic_transaction.h"

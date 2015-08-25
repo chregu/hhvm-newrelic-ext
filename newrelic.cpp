@@ -2,7 +2,7 @@
 #include "hphp/runtime/ext/std/ext_std_errorfunc.h"
 #include "hphp/runtime/base/php-globals.h"
 #include "hphp/runtime/base/hphp-system.h"
-#include "hphp/runtime/ext/ext_hotprofiler.h"
+#include "hphp/runtime/ext/hotprofiler/ext_hotprofiler.h"
 #include "newrelic_transaction.h"
 #include "newrelic_collector_client.h"
 #include "newrelic_common.h"
