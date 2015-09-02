@@ -262,25 +262,27 @@ function newrelic_custom_metric(string $name, float $value): int;
 // sql helper/parser
 function _newrelic_parse_query($query): array {
 	if (preg_match( '/^\s*SELECT/i', $query)) {
-		if (preg_match('/\s+FROM\s+[`\'"]?([a-z\d_]+)[`\'"]?/i', $query, $match)) {
+		if (preg_match('/\s+FROM\s+[`\'"]?([a-z\d_\.]+)[`\'"]?/i', $query, $match)) {
+			return ['select', $match[1]];
+		} else if (preg_match('/\s+[`\'"]?([a-z\d_\.]+)[`\'"]?/i', $query, $match)) {
 			return ['select', $match[1]];
 		} else {
 			return ['select', 'unknown'];
 		}
 	} else if (preg_match( '/^\s*INSERT/i', $query)) {
-		if (preg_match('/\s+INTO\s+[`\'"]?([a-z\d_]+)[`\'"]?/i', $query, $match)) {
+		if (preg_match('/\s+INTO\s+[`\'"]?([a-z\d_\.]+)[`\'"]?/i', $query, $match)) {
 			return ['insert', $match[1]];
 		} else {
 			return ['insert', 'unknown'];
 		}
 	} else if (preg_match( '/^\s*UPDATE/i', $query)) {
-		if (preg_match('/UPDATE\s+[`\'"]?([a-z\d_]+)[`\'"]?/i', $query, $match)) {
+		if (preg_match('/UPDATE\s+[`\'"]?([a-z\d_\.]+)[`\'"]?/i', $query, $match)) {
 			return ['update', $match[1]];
 		} else {
 			return ['update', 'unknown'];
 		}
 	} else if (preg_match( '/^\s*DELETE/i', $query)) {
-		if (preg_match('/DELETE\s+[`\'"]?([a-z\d_]+)[`\'"]?/i', $query, $match)) {
+		if (preg_match('/DELETE\s+[`\'"]?([a-z\d_\.]+)[`\'"]?/i', $query, $match)) {
 			return ['delete', $match[1]];
 		} else {
 			return ['delete', 'unknown'];
@@ -291,7 +293,14 @@ function _newrelic_parse_query($query): array {
 		} else {
 			return ['select', 'SHOW'];
 		}
-	}
+	} else if (preg_match( '/^\s*BEGIN/i', $query)) {
+		return ['select', 'BEGIN'];
+	} else if (preg_match( '/^\s*COMMIT/i', $query)) {
+		return ['select', 'COMMIT'];
+	} else if (preg_match( '/^\s*ROLLBACK/i', $query)) {
+		return ['select', 'ROLLBACK'];
+        }
+
 	return ['select', 'undefined'];
 }
 

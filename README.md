@@ -33,7 +33,7 @@ For more info, see also the following blog posts:
 
 ## Installation
 
-This extension is known to work with HHVM 3.7. For older HHVM versions, see the other branches.
+This extension is known to work with HHVM 3.9. For older HHVM versions, see the other branches.
 
 If you don't need function level profiling data or are using HHVM 3.7, you can use the HHVM packages provided by Facebook. If you want to use function level profiling on HHVM 3.5, [see below](#using-function-level-profiling-in-hhvm-35).
 
@@ -67,20 +67,13 @@ sudo apt-get install hhvm-dev
 git clone git@github.com:chregu/hhvm-newrelic-ext.git
 cd hhvm-newrelic-ext
 
-# the following is needed if you use HHVM 3.7, since one header file is missing
-wget -O /usr/include/hphp/runtime/version.h https://raw.githubusercontent.com/facebook/hhvm/HHVM-3.7/hphp/runtime/version.h
+# the following is needed if you use HHVM 3.5, since one header file is missing
+wget -O /usr/include/hphp/runtime/version.h https://raw.githubusercontent.com/facebook/hhvm/HHVM-3.5/hphp/runtime/version.h
 
 hphpize
 cmake .
 make
 make install
-```
-
-### Configuring extention
-
-```
-cd /usr/lib/x86_64-linux-gnu/hhvm/extensions/
-sudo ln -s 20150212/newrelic.so
 ```
 
 ### Configuring hhvm
