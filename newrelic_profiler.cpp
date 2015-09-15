@@ -16,7 +16,7 @@
 */
 
 #include "newrelic_profiler.h"
-#include "hphp/runtime/ext/ext_hotprofiler.h"
+#include "hphp/runtime/ext/hotprofiler/ext_hotprofiler.h"
 
 namespace HPHP {
     void NewRelicProfiler::beginFrameEx(const char *symbol) {
