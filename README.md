@@ -33,7 +33,7 @@ For more info, see also the following blog posts:
 
 ## Installation
 
-This extension is known to work with HHVM 3.7. For older HHVM versions, see the other branches.
+This extension is known to work with HHVM 3.9. For older HHVM versions, see the other branches.
 
 If you don't need function level profiling data or are using HHVM 3.7, you can use the HHVM packages provided by Facebook. If you want to use function level profiling on HHVM 3.5, [see below](#using-function-level-profiling-in-hhvm-35).
 
