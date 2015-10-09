@@ -14,7 +14,7 @@ before_install:
 
 install:
 - mkdir ${TRAVIS_BUILD_DIR}/newrelic
-- mkdir ${TRAVIS_BUILD_DIR}/newrelic
+- cd ${TRAVIS_BUILD_DIR}/newrelic
 - wget https://download.newrelic.com/agent_sdk/nr_agent_sdk-v0.16.1.0-beta.x86_64.tar.gz
 - tar -xzf nr_agent_sdk-*.tar.gz
 - cp nr_agent_sdk-*/include/* /usr/local/include/
