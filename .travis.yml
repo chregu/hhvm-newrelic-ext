@@ -13,6 +13,7 @@ before_install:
   - sudo apt-get install -qq hhvm hhvm-dev g++-4.9 libboost-dev 
 
 install:
+- hhvm --version
 - mkdir ${TRAVIS_BUILD_DIR}/newrelic
 - cd ${TRAVIS_BUILD_DIR}/newrelic
 - wget https://download.newrelic.com/agent_sdk/nr_agent_sdk-v0.16.1.0-beta.x86_64.tar.gz
@@ -52,6 +53,7 @@ install:
 
 script:
   - cd ${TRAVIS_BUILD_DIR}
+  - hhvm --version
   - hphpize
   - cmake .
   - make
