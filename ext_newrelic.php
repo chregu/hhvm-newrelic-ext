@@ -124,8 +124,16 @@ class NewRelicExtensionHelper {
     }
 
     static function errorCallback($type, $message, $c) {
-        $errno = $errno & error_reporting();
-        if($errno == 0) return false;
+        switch($type)
+        {
+           case E_WARNING: // 2 //
+           case E_NOTICE: // 8 //
+           case E_USER_NOTICE: // 1024 //
+           case E_STRICT: // 2048 //
+           case E_DEPRECATED: // 8192 //
+           case E_USER_DEPRECATED: // 16384 //
+               return false;
+       }
 
         $exception_type = self::friendlyErrorType($type);
         $error_message = $message;
