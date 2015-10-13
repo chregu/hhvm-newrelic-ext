@@ -61,6 +61,8 @@ For compiling the extension, you need the dev package as well, eg. on Ubuntu/Deb
 sudo apt-get install hhvm-dev
 ```
 
+There are known issues on Ubuntu 12.04 and Debian Wheezy
+
 ### Compile the extension
 
 ```
