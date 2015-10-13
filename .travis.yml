@@ -3,11 +3,6 @@ sudo: required
 services:
   - docker
 
-language: php
-
-php:
-  - hhvm
-
 compiler:
   - gcc
 
