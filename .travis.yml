@@ -10,7 +10,7 @@ group: edge
 
 before_install:
   - docker pull absalomedia/hhvm-dev
-  - docker run -d -p 127.0.0.1:80:9000 absalomedia/hhvm-dev /bin/sh
+  - docker run -t -i absalomedia/hhvm-dev /bin/sh
   - docker ps -a
   - docker info
 
