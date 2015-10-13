@@ -8,7 +8,7 @@ compiler:
 
 before_install:
   - docker pull absalomedia/hhvm-dev
-  - docker docker run -d -p 127.0.0.1:80:4567 absalomedia/hhvm-dev /bin/sh
+  - docker run -d -p 127.0.0.1:80:4567 absalomedia/hhvm-dev /bin/sh
   - docker ps -a
   - docker info
 
