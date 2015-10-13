@@ -8,6 +8,7 @@ compiler:
 
 before_install:
   - docker pull absalomedia/hhvm-dev
+  - docker run -t -i hhvm-dev /bin/bash
   - docker ps -a
   - docker info
 
