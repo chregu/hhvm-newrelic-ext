@@ -8,9 +8,9 @@ compiler:
 
 before_install:
   - docker pull absalomedia/hhvm-dev
+  - docker run hhvm --version
 
 install:
-- hhvm --version
 - mkdir ${TRAVIS_BUILD_DIR}/newrelic
 - cd ${TRAVIS_BUILD_DIR}/newrelic
 - wget https://download.newrelic.com/agent_sdk/nr_agent_sdk-v0.16.1.0-beta.x86_64.tar.gz
