@@ -9,7 +9,7 @@ compiler:
 before_install:
   - docker pull absalomedia/hhvm-dev
   - docker ps -a
-  - docker run -i -t hhvm-dev /bin/bash
+   -sudo docker info
 
 install:
 - mkdir ${TRAVIS_BUILD_DIR}/newrelic
