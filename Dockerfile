@@ -3,7 +3,7 @@ FROM absalomedia/hhvm-dev
 MAINTAINER Lawrence Meckan <media@absalom.biz>
 
 RUN apt-get update \
-  && apt-get -y install wget curl unzip && \
+  && apt-get -y install wget curl unzip \
   && apt-get -y upgrade \
   && apt-get -y autoremove \
   && apt-get -y clean \
