@@ -1,5 +1,7 @@
 # (Unofficial) New Relic extension for HHVM
 
+https://travis-ci.org/absalomedia/hhvm-newrelic-ext.svg
+
 This is an unofficial New Relic extension for [HHVM](http://hhvm.com/) which implements the [New Relic PHP agent API](https://docs.newrelic.com/docs/agents/php-agent/configuration/php-agent-api) as much as possible.
 
 It's build on the [New Relic SDK agent](https://docs.newrelic.com/docs/agents/agent-sdk/using-agent-sdk/getting-started-agent-sdk), which doesn't support all the features needed for rebuilding the PHP agent API and has some other caveats
