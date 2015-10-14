@@ -1,6 +1,6 @@
 # (Unofficial) New Relic extension for HHVM
 
-https://travis-ci.org/absalomedia/hhvm-newrelic-ext.svg
+[![Build Status](https://travis-ci.org/absalomedia/hhvm-newrelic-ext.svg?branch=master)](https://travis-ci.org/absalomedia/hhvm-newrelic-ext)
 
 This is an unofficial New Relic extension for [HHVM](http://hhvm.com/) which implements the [New Relic PHP agent API](https://docs.newrelic.com/docs/agents/php-agent/configuration/php-agent-api) as much as possible.
 
