@@ -9,27 +9,12 @@ compiler:
 group: edge
 
 before_install:
-  - docker pull absalomedia/hhvm-dev
-  - docker run -d -it absalomedia/hhvm-dev /bin/bash
+  - docker pull absalomedia/hhvm-newrelic-ext
   - docker ps -a
   - docker info
 
-install:
-- mkdir ${TRAVIS_BUILD_DIR}/newrelic
-- cd ${TRAVIS_BUILD_DIR}/newrelic
-- wget https://download.newrelic.com/agent_sdk/nr_agent_sdk-v0.16.1.0-beta.x86_64.tar.gz
-- tar -xzf nr_agent_sdk-*.tar.gz
-- sudo cp nr_agent_sdk-*/include/* /usr/local/include/
-- sudo cp nr_agent_sdk-*/lib/* /usr/local/lib/
-- export CXX="g++-4.9"
-
 script:
-  - cd ${TRAVIS_BUILD_DIR}
-  - hhvm --version
-  - hphpize
-  - cmake .
-  - make
-  - make install
+  - docker build -t absalomedia/hhvm-newrelic-ext . 
 
 notifications:
     on_success: never
