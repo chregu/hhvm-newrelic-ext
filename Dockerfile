@@ -2,6 +2,13 @@ FROM absalomedia/hhvm-dev
 
 MAINTAINER Lawrence Meckan <media@absalom.biz>
 
+RUN apt-get update \
+  && apt-get -y install wget curl unzip && \
+  && apt-get -y upgrade \
+  && apt-get -y autoremove \
+  && apt-get -y clean \
+  && rm -rf /tmp/* /var/tmp/*
+
 RUN mkdir -p /usr/src/newrelic && \
     cd /usr/src/newrelic
 RUN echo "Downloading New Relic Agent SDK ..." && wget -qO https://download.newrelic.com/agent_sdk/nr_agent_sdk-v0.16.1.0-beta.x86_64.tar.gz
