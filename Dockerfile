@@ -24,4 +24,4 @@ RUN git clone https://github.com/absalomedia/hhvm-newrelic-ext.git && \
   hphpize && \
   cmake .  && \
   make && \
-  make install && \
+  make install
