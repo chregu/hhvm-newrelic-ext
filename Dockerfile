@@ -3,7 +3,7 @@ FROM absalomedia/hhvm-dev
 MAINTAINER Lawrence Meckan <media@absalom.biz>
 
 RUN apt-get update \
-  && apt-get -y install wget curl unzip \
+  && apt-get -y install wget curl unzip git \
   && apt-get -y upgrade \
   && apt-get -y autoremove \
   && apt-get -y clean \
@@ -11,9 +11,8 @@ RUN apt-get update \
 
 RUN mkdir -p /usr/src/newrelic && \
     cd /usr/src/newrelic
-RUN echo "Downloading New Relic Agent SDK ..." && wget -qO https://download.newrelic.com/agent_sdk/nr_agent_sdk-v0.16.1.0-beta.x86_64.tar.gz
-RUN tar -xzf nr_agent_sdk-*.tar.gz && \
-    cp nr_agent_sdk-*/include/* /usr/local/include/ && \
+RUN echo "Downloading New Relic SDK ..." && wget -qO - https://download.newrelic.com/agent_sdk/nr_agent_sdk-v0.16.1.0-beta.x86_64.tar.gz | tar -xzf nr_agent_sdk-*.tar.gz 
+RUN cp nr_agent_sdk-*/include/* /usr/local/include/ && \
     cp nr_agent_sdk-*/lib/* /usr/local/lib/
 RUN export CXX="g++-4.9"
 
