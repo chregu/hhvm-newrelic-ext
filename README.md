@@ -98,7 +98,7 @@ When you use the PHP agent of New Relic, you're certainly used to have function 
 
 * You have to explicitely enable it
 * It slows down your request by factor 2 or more
-* It can only show up to 2'000 function calls
+* It can only show up to 2000 function calls
 * If you use an unpatched HHVM 3.5 or less (fixed in HHVM 3.6), it's even slower
 
 ### Enabling Function Level Profiling

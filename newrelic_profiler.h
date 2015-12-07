@@ -44,6 +44,9 @@ namespace HPHP {
         //virtual Frame *allocateFrame() override;
         private:
 
+        void vscan(IMarker& mark) const override {
+        }
+
         class NewRelicProfilerFrame : public Frame {
             public:
             virtual ~NewRelicProfilerFrame() {
