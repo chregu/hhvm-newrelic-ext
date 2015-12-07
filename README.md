@@ -1,5 +1,7 @@
 # (Unofficial) New Relic extension for HHVM
 
+[![Build Status](https://travis-ci.org/absalomedia/hhvm-newrelic-ext.svg?branch=master)](https://travis-ci.org/absalomedia/hhvm-newrelic-ext)
+
 This is an unofficial New Relic extension for [HHVM](http://hhvm.com/) which implements the [New Relic PHP agent API](https://docs.newrelic.com/docs/agents/php-agent/configuration/php-agent-api) as much as possible.
 
 It's build on the [New Relic SDK agent](https://docs.newrelic.com/docs/agents/agent-sdk/using-agent-sdk/getting-started-agent-sdk), which doesn't support all the features needed for rebuilding the PHP agent API and has some other caveats
@@ -61,6 +63,8 @@ For compiling the extension, you need the dev package as well, eg. on Ubuntu/Deb
 sudo apt-get install hhvm-dev
 ```
 
+There are known issues on Ubuntu 12.04 and Debian Wheezy
+
 ### Compile the extension
 
 ```
@@ -94,7 +98,7 @@ When you use the PHP agent of New Relic, you're certainly used to have function 
 
 * You have to explicitely enable it
 * It slows down your request by factor 2 or more
-* It can only show up to 2'000 function calls
+* It can only show up to 2000 function calls
 * If you use an unpatched HHVM 3.5 or less (fixed in HHVM 3.6), it's even slower
 
 ### Enabling Function Level Profiling
