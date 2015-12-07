@@ -189,15 +189,14 @@ static Variant HHVM_FUNCTION(newrelic_get_scoped_database_segment, const String 
 }
 
 static Variant HHVM_FUNCTION(newrelic_get_scoped_external_segment, const String & host, const String & name) {
-    ScopedExternalSegment * segment = nullptr;
     // NEWOBJ existsonly until HHVM 3.4
     #ifdef NEWOBJ
-        segment = NEWOBJ(ScopedExternalSegment)(host.c_str(), name.c_str());
+      auto segment = NEWOBJ(ScopedExternalSegment)(host.c_str(), name.c_str());
     // newres exists only until HHVM 3.10
     #elif defined newres
-        segment = newres<ScopedExternalSegment>(host.c_str(), name.c_str());
+      auto segment = newres<ScopedExternalSegment>(host.c_str(), name.c_str());
     #else
-        segment = req::make<ScopedExternalSegment>(host.c_str(), name.c_str());
+      auto segment = req::make<ScopedExternalSegment>(host.c_str(), name.c_str());
     #endif
     return Resource(segment);
 }
