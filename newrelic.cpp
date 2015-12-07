@@ -199,7 +199,7 @@ static Variant HHVM_FUNCTION(newrelic_get_scoped_external_segment, const String 
     #elif defined newres
         segment = newres<ScopedExternalSegment>(host.c_str(), name.c_str());
     #else
-        segment = req:make<ScopedExternalSegment>(host.c_str(), name.c_str());
+        segment = req::make<ScopedExternalSegment>(host.c_str(), name.c_str());
     #endif
     return Resource(segment);
 }
