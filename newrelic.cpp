@@ -164,28 +164,26 @@ static void HHVM_FUNCTION(newrelic_set_external_profiler, int64_t maxdepth ) {
 }
 
 static Variant HHVM_FUNCTION(newrelic_get_scoped_generic_segment, const String & name) {
-    ScopedGenericSegment * segment = nullptr;
     #if defined NEWOBJ
-        segment = NEWOBJ(ScopedGenericSegment)(name.c_str());
+        auto segment = NEWOBJ(ScopedGenericSegment)(name.c_str());
     // newres exists only until HHVM 3.10.0
     #elif defined newres
-        segment = newres<ScopedGenericSegment>(name.c_str());
+        auto segment = newres<ScopedGenericSegment>(name.c_str());
      #else
-        segment = req::make<ScopedGenericSegment>(name.c_str());
+        auto segment = req::make<ScopedGenericSegment>(name.c_str());
     #endif
     return Resource(segment);
 }
 
 static Variant HHVM_FUNCTION(newrelic_get_scoped_database_segment, const String & table, const String & operation, const String & sql, const String & sql_trace_rollup_name) {
-    ScopedDatastoreSegment * segment = nullptr;
     // NEWOBJ existsonly until HHVM 3.4
     #ifdef NEWOBJ
-        segment = NEWOBJ(ScopedDatastoreSegment)(table.c_str(), operation.c_str(), sql.c_str(), sql_trace_rollup_name.c_str());
+        auto segment = NEWOBJ(ScopedDatastoreSegment)(table.c_str(), operation.c_str(), sql.c_str(), sql_trace_rollup_name.c_str());
     // newres exists only until HHVM 3.10
     #elif defined newres
-        segment = newres<ScopedDatastoreSegment>(table.c_str(), operation.c_str(), sql.c_str(), sql_trace_rollup_name.c_str());
+        auto segment = newres<ScopedDatastoreSegment>(table.c_str(), operation.c_str(), sql.c_str(), sql_trace_rollup_name.c_str());
     #else
-        segment = req::make<ScopedDatastoreSegment>(table.c_str(), operation.c_str(), sql.c_str(), sql_trace_rollup_name.c_str());
+        auto segment = req::make<ScopedDatastoreSegment>(table.c_str(), operation.c_str(), sql.c_str(), sql_trace_rollup_name.c_str());
     #endif
     return Resource(segment);
 }
